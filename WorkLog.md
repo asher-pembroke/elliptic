@@ -1,4 +1,6 @@
-* finite fields
+# 2022-05-18 08:00:41.647616: clock-out
+
+* finite fields - taking modulus of both sides maps the elliptic curve into the mod space but overloads geogebra
 
 # 2022-05-18 07:40:11.240621: clock-in
 
