@@ -1,3 +1,4 @@
+* got discrete elliptic curves working
 
 # 2022-05-21 09:02:07.369972: clock-in
 
