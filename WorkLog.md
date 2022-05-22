@@ -1,3 +1,6 @@
+
+# 2022-05-21 20:32:38.467404: clock-in
+
 # 2022-05-21 11:20:15.099236: clock-out
 
 * got discrete elliptic curves working
