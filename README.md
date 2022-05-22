@@ -85,7 +85,7 @@ add_mod((22, 6), (22, 6), p)
 ```
 
 ```python
-def multiply_mod(P, n, p, a=7):
+def multiply_mod(P, n, p, a=7, b=None):
     P_ = P + ()
     for _ in range(1, n+1):
         P_ = add_mod(P_, P_, p, a)
@@ -122,7 +122,7 @@ def divisors(n):
 def subgroup_order(P, p, a, b):
     N = order(elliptic(p, a, b))
     for _ in divisors(N):
-        print(_)
+#         print(_)
         if multiply_mod(P, _, p=p, a=a) == P:
             break
     if _ == N:
@@ -185,9 +185,66 @@ prime_divisor(42)
 ```
 
 ```python
-cofactor(42, 7)
+order(elliptic(**e1))
 ```
 
 ```python
-G__ = (12, 8)
+prime_divisor(37)
+```
+
+```python
+cofactor(37, 37)
+```
+
+```python
+e1 = dict(p=29, a=-1, b=1)
+N_ = order(elliptic(**e1))
+N_
+```
+
+```python
+H__ = (12, 8)
+
+G__ = multiply_mod(H__, 37, **e1)
+G__
+```
+
+```python
+for _ in range(1, 38):
+    print(multiply_mod(G__, _, **e1))
+```
+
+## Secret sharing
+
+Since $H=dG$ is uninvertable, we can define a public/private key pairs as ($d_{priv}, H_{pub}$)
+
+Suppose alice has public $H_a$ and private key $d_a$ and similarly for Bob $H_b$ and $d_b$. Alice and Bob may compute a shared secret $S = d_aH_b = d_bH_a = d_ad_bG$. This shared secret can be used by either party to encrypt blobs of data without fear of eavesdropping.
+
+```python
+d_a = 5
+H_a = multiply_mod(G__, d_a, **e1)
+
+d_b = 9
+H_b = multiply_mod(G__, d_b, **e1)
+
+S_b = multiply_mod(H_a, d_b, **e1) # Bob generates secret key using Alice's pub key
+S_a = multiply_mod(H_b, d_a, **e1) # Alice generates secret key using Bob's pub key
+assert S_a == S_b # check that Alice and Bob get the same result
+S_a
+```
+
+## ECDSA
+
+1. choose $k \in [1, n]$ for subgroup order $n$
+1. calculate $P=kG$
+
+```python
+G_ = (9,24)
+n_ = subgroup_order(G_, **e1) # should be 37 instead of 38
+
+multiply_mod(G_, d_b, **e1)
+```
+
+```python
+from random import randrange
 ```
