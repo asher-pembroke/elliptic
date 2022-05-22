@@ -86,7 +86,7 @@ add_mod((22, 6), (22, 6), p)
 
 ```python
 def multiply_mod(P, n, p, a=7):
-    P_ = P
+    P_ = P + ()
     for _ in range(1, n+1):
         P_ = add_mod(P_, P_, p, a)
         if P_ == P:
@@ -124,7 +124,11 @@ def subgroup_order(P, p, a, b):
     for _ in divisors(N):
         print(_)
         if multiply_mod(P, _, p=p, a=a) == P:
-            return _+1
+            break
+    if _ == N:
+        return N # already contains the point at infinity
+    else:
+        return _+1
 
 subgroup_order((2,3), p=37, a=-1, b=3)
 ```
@@ -146,13 +150,44 @@ fig
 # choosing generator point P
 
 Trick is 
-1. given N choose the sugroup order n to be a prime divisor of N
+1. given N choose the subgroup order n to be a prime divisor of N
 1. compute cofactor h = N/n
-1. choose random point P
+1. choose random point P -- this could be fun!
 1. compute G=hP
 1. if G != 0, then n(hP)=0 and G is a generator of the whole curve
 1. if G = 0, go back to (3)
 
 ```python
+def is_prime(n):
+    prime_flag = 0
+      
+    if(n > 1):
+        for i in range(2, int(np.sqrt(n)) + 1):
+            if (n % i == 0):
+                prime_flag = 1
+                break
+        if (prime_flag == 0):
+            return True
+    return False
+```
 
+```python
+def prime_divisor(n):
+    """find the largest prime divisor of n"""
+    for _ in list(divisors(n))[::-1]:
+        if is_prime(_):
+            return _
+
+def cofactor(order, n):
+    return int(order/n)
+
+prime_divisor(42)
+```
+
+```python
+cofactor(42, 7)
+```
+
+```python
+G__ = (12, 8)
 ```
