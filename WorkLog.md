@@ -1,3 +1,6 @@
+
+# 2022-05-24 18:49:59.838147: clock-in
+
 # 2022-05-23 21:57:37.167992: clock-out
 
 * debugging multiply
