@@ -53,6 +53,7 @@ $$ y_r = (y_p + m(x_R-x_P)) mod(p) $$
 
 ```python
 # taken from https://stackoverflow.com/questions/4798654/modular-multiplicative-inverse-function-in-python
+# and http://anh.cs.luc.edu/331/notes/xgcd.pdf
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)
@@ -60,29 +61,88 @@ def egcd(a, b):
         g, y, x = egcd(b % a, a)
         return (g, x - (b // a) * y, y)
 
+def xgcd(a, b):
+    prevx, x = 1, 0
+    prevy, y = 0, 1
+    while b:
+        q = a//b
+        x, prevx = prevx - q*x, x
+        y, prevy = prevy - q*y, y
+        a, b = b, a % b
+    return a, prevx, prevy
+    
+def modinv_2(a, b):
+#         a = abs(a)%b # seems to be a bug because the next line allows negative assertion to pass
+        if a < 0:
+            a += b
+            
+        for m in range(b):
+            if (a*m)%b == 1:
+                return m
+        return None
+assert (modinv_2(13, 17)*13)%17 == 1
+assert (modinv_2(-13, 17)*(-13))%17 == 1
+
+
 def modinv(a, m):
     """multiplicative mod inverse of a mod m"""
-    g, x, y = egcd(a, m)
+#         if( n < 0 ) {
+#             n = n + this.k;
+#         }
+    if a < 0:
+        a = a + m
+#     g, x, y = egcd(a, m)
+    g, x, y = xgcd(a, m)
     if g != 1:
         raise Exception(f'modular inverse does not exist for {a} mod {m}')
     else:
         return x % m
+
+assert (modinv(13, 17)*13)%17 == 1
+assert (modinv(-13, 17)*-13)%17 == 1
 ```
 
 ```python
 def add_mod(P, Q, p, a, b=None):
-    """add points P and Q through their intserection with curve (p,a,b) b is unused"""
+    """add points P and Q through their intserection with curve (p,a,b) b is unused
+    
+    based on https://github.com/andreacorbellini/ecc/blob/865b8f9e79ed94a9d004a9b553f4b3add55878be/interactive/ec.js#L1059
+    """
+    if P is None:
+        return Q
+    if Q is None:
+        return P
+    
     x_p, y_p = P
     x_q, y_q = Q
-    try:
-        if (x_p == x_q)&(y_p == y_q):
-            m = ((3*x_p**2+a)*modinv(2*y_p, p))%p
+    
+    if x_p != x_q: # distinct points
+        m = (y_p-y_q)*modinv(x_p - x_q);
+    else:
+        if (y_p == 0)&(y_q == 0 ):
+        # This may only happen if P=Q is a root of the elliptic
+        # curve, hence the line is vertical.
+            print('found root of elliptic')
+            return None
+        elif y_p == y_q:
+        # The points are the same, but the line is not vertical.
+#             print('points are the same')
+            m = (3*x_p*x_p+a)*modinv(2*y_p, p)
+    
         else:
-            m = ((y_p - y_q)*modinv((x_p-x_q)%p, p))%p
-    except:
-        raise Exception(f"Cannot add {P} and {Q}")
-    x_r = (m**2 - x_p - x_q)%p
-    y_r = (y_p + m*(x_r-x_p))%p
+        # The points are not the same and the line is vertical.
+            print('found vertical')
+            return None
+    m = m%p
+
+    x_r = (m*m - x_p - x_q)%p
+    y_r = (m*(x_p-x_r) - y_p)%p
+    
+    if x_r < 0:
+        x_r += p
+    if y_r < 0:
+        y_r += p
+
     return x_r, y_r
     
 
@@ -90,13 +150,22 @@ add_mod((22, 6), (22, 6), 37, 7)
 ```
 
 ```python
+P_ = (3,6)
+for i in range(10):
+    print(i, P_)
+    P_ = add_mod(P_, P_, p=97, a=2)
+```
+
+```python
 def multiply_mod(P, n, p, a, b=None):
     """multiply P n times for curve (p,a,b)"""
     P_ = P + ()
-    for _ in range(1, n+1):
-        P_ = add_mod(P_, P_, p, a)
-        if P_ == P:
-            break
+    if n == 0:
+        return 0
+    elif n == 1:
+        return P_
+    for _ in range(n):
+        P_ = add_mod(P_, P_, p, a) + ()
     return P_
 
 multiply_mod((3, 6), 7, p=97, a=2)
@@ -107,7 +176,7 @@ e2 = dict(p=97, a=2, b=3)
 ```
 
 ```python
-for _ in range(1,10):
+for _ in range(10):
     print(f"{_}: {multiply_mod((3,6), _, **e2)}")
 ```
 
