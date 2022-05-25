@@ -1,3 +1,5 @@
+# 2022-05-24 19:13:29.982527: clock-out
+
 * checking out programming bitcoin
 
 # 2022-05-24 18:49:59.838147: clock-in
