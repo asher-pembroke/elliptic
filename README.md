@@ -139,8 +139,8 @@ def add_mod(P, Q, p, a, b=None):
             return None
         elif y_p == y_q:
         # The points are the same, but the line is not vertical.
-#             print('points are the same')
-            m = ((3*x_p*x_p+a)*modinv(2*y_p, p))%p
+            print('points are the same')
+            m = ((((3*(x_p*x_p)%p)%p+a)%p)*modinv((2*y_p)%p, p))%p
             x_r = ((m**2)%p - (2*x_p)%p)%p
             y_r = ((m*((x_p - x_r)%p))%p - y_p)%p
             return x_r, y_r
@@ -291,13 +291,9 @@ Checking with Jimmy Song's version:
 
 ```python
 import sys
-```
 
-```python
 sys.path.append('../programmingbitcoin/code-ch03/')
-```
 
-```python
 from ecc import Point, FieldElement
 ```
 
@@ -396,6 +392,10 @@ I'm getting the same result as Jimmy's code!
 <!-- #endregion -->
 
 # choosing generator point P
+
+Here's a paper on how secp256 generator was randomly selected
+
+https://www.secg.org/sec2-v2.pdf
 
 Trick is 
 1. given N choose the subgroup order n to be a prime divisor of N
@@ -506,19 +506,33 @@ H_a
 ```
 
 ```python
-def get_rk(G_, n_, **ec):
+import random
+
+def get_rk(G_, n_, seed=0, k=None, **ec):
+    """find point for subgroup order n, random integer k in [1,n] and elliptic curve ec"""
+    random.seed(seed)
     r = 0
-    while r == 0:
-        k = randrange(n_)%n_ # random in [1,n]
+    if k is None:
+        while r == 0:
+            k = randrange(n_)%n_ # random in [1,n]
+            P_ = multiply_mod(G_, k, **ec)
+            r, _ = P_
+            r = r%n_
+    else:
         P_ = multiply_mod(G_, k, **ec)
         r, _ = P_
+        r = r%n_
     return P_, k
 ```
 
 ```python
-P_, k = get_rk(G_, n_, **e1)
+P_, k = get_rk(G_, n_, k=3, **e1)
 r, _ = P_
 print(r, k)
+```
+
+```python
+multiply_mod(G_, 3, **e1)
 ```
 
 ```python
@@ -538,15 +552,19 @@ def get_s(k, z, r, d_a, n):
 
 ```python
 z = randrange(n_)%n_ # represents hash with same bitlength as n_
-
-s = get_s(k, z, r, d_a, n_)
-
-sig_az = (r,s) # alice's signature on z message
-sig_az
 ```
 
 ```python
-multiply_mod(G_, get_s(s, z, r, d_a, n_),  **e1)
+s = get_s(k, z, r, d_a, n_) # s = k^-1(z+r*d_a) mod n_
+```
+
+```python
+assert k == get_s(s, z, r, d_a, n_) # k = s^-1(z+r*d_a) mod_n
+```
+
+```python
+sig_az = (r, s) # alice's signature on z message
+sig_az
 ```
 
 To verify signature:
@@ -593,6 +611,125 @@ if r != P_result[0]%n_:
     raise AssertionError(f"signature does not match! {r} != {P_result[0]}")
 ```
 
-```python
+Compare with Jimmy Song's version
 
+```python
+import sys
+
+sys.path.append('../programmingbitcoin/code-ch03/')
+
+from ecc import Point, FieldElement
+```
+
+Choose the generator point
+
+```python
+n_
+```
+
+```python
+G_ = Point(FieldElement(9, e1['p']),
+           FieldElement(24, e1['p']),
+           FieldElement(e1['a']%e1['p'], e1['p']),
+           FieldElement(e1['b']%e1['p'], e1['p'])
+          )
+G_
+```
+
+```python
+multiply_mod?
+```
+
+```python
+add_mod?
+```
+
+```python
+add_mod((12, 8), (12, 8), **e1)
+```
+
+```python
+P_test = Point(FieldElement(12, e1['p']),
+           FieldElement(8, e1['p']),
+           FieldElement(e1['a']%e1['p'], e1['p']),
+           FieldElement(e1['b']%e1['p'], e1['p'])
+          )
+```
+
+```python
+P_test + P_test
+```
+
+```python
+P_ = (9,24)
+G_test = G_
+for i in range(1,15):
+    print(G_test, P_)
+    P_ = add_mod(P_, P_, **e1)
+    G_test = G_test + G_test
+```
+
+```python
+m_ = 3
+```
+
+```python
+m_ >>= 1
+```
+
+```python
+m_
+```
+
+Choose k
+
+```python
+k = 3
+```
+
+```python
+P_ = k*G_
+P_
+```
+
+```python
+r = P_.x.num%n_
+```
+
+Set Alice's priv key
+
+```python
+d_a = 5
+d_a
+```
+
+Compute Alice's pub key
+
+```python
+H_a = d_a*G_
+H_a
+```
+
+Get Alice's signature
+
+```python
+s = get_s(k, z, r, d_a, n_)
+assert k == get_s(s, z, r, d_a, n_) # check math
+s
+```
+
+Check signature
+
+```python
+u_1 = (modinv(s, n_)*z)%n_
+u_1
+```
+
+```python
+u_2 = (modinv(s, n_)*r)%n_
+u_2
+```
+
+```python
+assert u_1*G_ + u_2*H_a == P_
 ```
