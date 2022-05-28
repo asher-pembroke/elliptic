@@ -126,9 +126,11 @@ def add_mod(P, Q, p, a, b=None):
     x_q, y_q = Q
     
     if x_p != x_q: # distinct points
-        m = (((y_p-y_q)%p)*modinv((x_p - x_q)%p))%p;
+        print('distinct')
+        m = (((y_p-y_q)%p)*modinv((x_p - x_q)%p, p))%p;
         x_r = ((m*m)%p - (x_p - x_q)%p)%p
         y_r = ((m*((x_p-x_r)%p)%p)%p - y_p)%p
+        return x_r, y_r
     else:
         if (y_p == 0)&(y_q == 0 ):
         # This may only happen if P=Q is a root of the elliptic
@@ -252,11 +254,13 @@ get the subgroup order to do the multiplication modulus
 ```python
 def multiply_mod(P, n, p, a, b=None):
     """multiply P n times for curve (p,a,b)"""
-    
+    if P is None:
+        return None
     sgo = subgroup_order(P, p=p, a=a, b=b)
     
     # n(P) = (n mod sgo) P
     n_ = n%sgo
+
     P_ = P + ()
     if n_ == 0:
         return None
@@ -433,7 +437,7 @@ e1 = dict(p=29, a=-1, b=1)
 ```
 
 ```python
-order(elliptic(**e1))
+order(**e1)
 ```
 
 ```python
@@ -446,7 +450,7 @@ cofactor(37, 37)
 
 ```python
 
-N_ = order(elliptic(**e1))
+N_ = order(**e1)
 N_
 ```
 
@@ -457,11 +461,6 @@ G__ = multiply_mod(H__, 37, **e1)
 G__
 ```
 
-```python
-for _ in range(1, 38):
-    print(multiply_mod(G__, _, **e1))
-```
-
 ## Secret sharing
 
 Since $H=dG$ is uninvertable, we can define a public/private key pairs as ($d_{priv}, H_{pub}$)
@@ -470,10 +469,10 @@ Suppose alice has public $H_a$ and private key $d_a$ and similarly for Bob $H_b$
 
 ```python
 d_a = 5
-H_a = multiply_mod(G__, d_a, **e1)
+H_a = multiply_mod(H__, d_a, **e1)
 
 d_b = 9
-H_b = multiply_mod(G__, d_b, **e1)
+H_b = multiply_mod(H__, d_b, **e1)
 
 S_b = multiply_mod(H_a, d_b, **e1) # Bob generates secret key using Alice's pub key
 S_a = multiply_mod(H_b, d_a, **e1) # Alice generates secret key using Bob's pub key
@@ -489,27 +488,41 @@ S_a
 1. $s = k^{-1}(z+rd_A) modn$
 
 ```python
-d_a = 5
-H_a = multiply_mod(G__, d_a, **e1)
-```
-
-```python
 from random import randrange
 
 G_ = (9,24) # generator
 n_ = subgroup_order(G_, **e1) # should be 37 for {'p': 29, 'a': -1, 'b': 1}
+G_, n_
+```
 
+```python
+e1
+```
+
+```python
+d_a = 5 #alice's private key
+H_a = multiply_mod(G_, d_a, **e1) #alice's pub key
+H_a
+```
+
+```python
 def get_rk(G_, n_, **ec):
     r = 0
     while r == 0:
-        k = randrange(n_) # random in [1,n]
+        k = randrange(n_)%n_ # random in [1,n]
         P_ = multiply_mod(G_, k, **ec)
         r, _ = P_
     return P_, k
+```
 
+```python
 P_, k = get_rk(G_, n_, **e1)
 r, _ = P_
-print(r)
+print(r, k)
+```
+
+```python
+assert P_ == multiply_mod(G_, k, **e1)
 ```
 
 ```python
@@ -518,12 +531,22 @@ k_inv
 ```
 
 ```python
-z = randrange(n_) # represents hash with same bitlength as n_
+def get_s(k, z, r, d_a, n):
+    k_inv = modinv(k, n)
+    return (k_inv*((z%n_ + (r*d_a)%n_)%n_))%n_
+```
 
-s = (k_inv*(z+r*d_a))%n_
+```python
+z = randrange(n_)%n_ # represents hash with same bitlength as n_
+
+s = get_s(k, z, r, d_a, n_)
 
 sig_az = (r,s) # alice's signature on z message
 sig_az
+```
+
+```python
+multiply_mod(G_, get_s(s, z, r, d_a, n_),  **e1)
 ```
 
 To verify signature:
@@ -533,12 +556,12 @@ To verify signature:
 1. $P = u_1 G + u_2 H_a$
 
 ```python
-u_1 = (modinv(s,n_)*z)%n_
+u_1 = (modinv(s, n_)*z)%n_
 u_1
 ```
 
 ```python
-u_2 = (modinv(s,n_)*r)%n_
+u_2 = (modinv(s, n_)*r)%n_
 u_2
 ```
 
@@ -547,9 +570,25 @@ multiply_mod(G_, u_1, **e1), multiply_mod(H_a, u_2, **e1)
 ```
 
 ```python
-P_result = add_mod(multiply_mod(G_, u_1, **e1),
-        multiply_mod(H_a, u_2, **e1),
-        **e1)
+a_ = multiply_mod(G_, u_1, **e1)
+a_
+```
+
+```python
+b_ = multiply_mod(H_a, u_2, **e1)
+b_
+```
+
+```python
+add_mod(a_, b_, **e1)
+```
+
+```python
+P_result = add_mod(multiply_mod(G_, u_1, **e1), multiply_mod(H_a, u_2, **e1), **e1)
+P_result
+```
+
+```python
 if r != P_result[0]%n_:
     raise AssertionError(f"signature does not match! {r} != {P_result[0]}")
 ```
