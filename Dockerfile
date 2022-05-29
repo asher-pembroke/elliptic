@@ -21,6 +21,10 @@ WORKDIR /home/elliptic
 RUN jupyter nbextension enable --py jupytext
 RUN jupyter nbextension install --py jupytext
 
+RUN pip install plotly dash jupyter-dash
+RUN pip install numpy
+
+RUN git clone https://github.com/jimmysong/programmingbitcoin.git /home/programmingbitcoin
 
 # CMD jupyter notebook . --port=8888 --no-browser --ip=0.0.0.0 --allow-root
 
