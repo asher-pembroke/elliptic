@@ -729,6 +729,10 @@ assert u_1*G_ + u_2*H_a == P_
 # Dashboard
 
 ```python
+import dash_bootstrap_components as dbc
+```
+
+```python
 from psidash.psidash import load_app
 
 app = load_app(__name__, 'elliptic.yaml')
@@ -739,10 +743,6 @@ if __name__ == '__main__':
                    mode='external',
                    extra_files=["elliptic.yaml", "elliptic/dashboard.py"],
                    debug=True)
-```
-
-```python
-abs(-3)
 ```
 
 ```python
@@ -758,6 +758,8 @@ get_eqn_str(3, -4, 5)
 
 %autoreload 2
 ```
+
+$ (3, 4) $
 
 ```python
 
