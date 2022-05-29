@@ -1,3 +1,4 @@
+* setting up docker
 
 # 2022-05-29 11:24:02.600724: clock-in
 

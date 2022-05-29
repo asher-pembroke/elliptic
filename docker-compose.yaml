@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+
+  elliptic:
+    image: apembroke/elliptic
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    # command: ["gunicorn", "--workers=4", "--bind", "0.0.0.0:5000", "audiolizer:server"]
+    command: ["jupyter", "notebook", ".", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
+    volumes:
+      - type: bind
+        source: ${PWD}
+        target: /home/elliptic
+    working_dir: /home/elliptic
