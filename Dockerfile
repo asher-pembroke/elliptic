@@ -23,6 +23,8 @@ RUN jupyter nbextension install --py jupytext
 
 RUN pip install plotly dash jupyter-dash
 RUN pip install numpy
+RUN pip install dash-bootstrap-components
+RUN pip install dash_daq
 
 RUN git clone https://github.com/jimmysong/programmingbitcoin.git /home/programmingbitcoin
 

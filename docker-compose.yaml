@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
+      - "8050:8050"
     # command: ["gunicorn", "--workers=4", "--bind", "0.0.0.0:5000", "audiolizer:server"]
     command: ["jupyter", "notebook", ".", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
     volumes:

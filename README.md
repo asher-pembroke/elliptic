@@ -139,7 +139,7 @@ def add_mod(P, Q, p, a, b=None):
             return None
         elif y_p == y_q:
         # The points are the same, but the line is not vertical.
-            print('points are the same')
+#             print('points are the same')
             m = ((((3*(x_p*x_p)%p)%p+a)%p)*modinv((2*y_p)%p, p))%p
             x_r = ((m**2)%p - (2*x_p)%p)%p
             y_r = ((m*((x_p - x_r)%p))%p - y_p)%p
@@ -637,14 +637,6 @@ G_
 ```
 
 ```python
-multiply_mod?
-```
-
-```python
-add_mod?
-```
-
-```python
 add_mod((12, 8), (12, 8), **e1)
 ```
 
@@ -732,4 +724,41 @@ u_2
 
 ```python
 assert u_1*G_ + u_2*H_a == P_
+```
+
+# Dashboard
+
+```python
+from psidash.psidash import load_app
+
+app = load_app(__name__, 'elliptic.yaml')
+
+if __name__ == '__main__':
+    app.run_server(host='0.0.0.0',
+                   port=8050,
+                   mode='external',
+                   extra_files=["elliptic.yaml", "elliptic/dashboard.py"],
+                   debug=True)
+```
+
+```python
+abs(-3)
+```
+
+```python
+from elliptic.dashboard import get_eqn_str
+```
+
+```python
+get_eqn_str(3, -4, 5)
+```
+
+```python
+%load_ext autoreload
+
+%autoreload 2
+```
+
+```python
+
 ```

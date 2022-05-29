@@ -1,0 +1,116 @@
+
+import:
+  dcc: dash.dcc
+  html: dash.html
+  dbc: dash_bootstrap_components
+  daq: dash_daq
+
+external_stylesheets:
+  - https://codepen.io/chriddyp/pen/bWLwgP.css
+  - https://www.w3schools.com/w3css/4/w3.css
+  - https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css
+
+external_scripts:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML
+
+app:
+  jupyter_dash.JupyterDash:
+    external_stylesheets: ${external_stylesheets}
+    external_scripts: ${external_scripts}
+    title: elliptic
+
+run_server:
+  host: '0.0.0.0'
+  port: 8050
+  extra_files:
+    - elliptic.yaml
+  debug: True
+
+input_p:
+  dbc.Col:
+    width: 4
+    children:
+      - dbc.Label: p
+      - daq.Slider:
+          id: user-input-p
+          min: 3
+          max: 100
+          value: 14
+          updatemode: drag
+          handleLabel: 'me!'
+
+input_a:
+  dbc.Col:
+    width: 4
+    children:
+    - dbc.Label: a
+    - dbc.Input:
+        id: user-input-a
+        type: number
+        value: 0
+
+input_b:
+  dbc.Col:
+    width: 4
+    children:
+    - dbc.Label: b
+    - dbc.Input:
+        id: user-input-b
+        type: number
+        value: 7
+parameters:
+  html.Div:
+    children:
+      - dbc.Row:
+          children:
+            - ${input_p}
+            - ${input_a}
+            - ${input_b}
+
+layout:
+  dbc.Form:
+    children:
+    - dbc.Row:
+        children:
+        - dbc.Col:
+            width: 8
+            children:
+            - html.H1: Finite Elliptic Curves
+            - html.Div: BTC++ 2022, Austin TX
+    - dbc.Row:
+        children:
+        - dbc.Col:
+            width: 8
+            children:
+            - ${parameters}
+            - dcc.Graph:
+                id: curve-graph
+                mathjax: True
+                config:
+                  displayModeBar: False
+
+
+callbacks:
+  show_graph:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+    output:
+      - id: curve-graph
+        attr: figure
+    callback: elliptic.dashboard.show_graph
+
+  update_slider_label:
+    input:
+      - id: user-input-p
+        attr: value
+    output:
+      - id: user-input-p
+        attr: handleLabel
+    callback: elliptic.dashboard.update_p_slider_label
+
+
