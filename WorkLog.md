@@ -1,3 +1,6 @@
+
+# 2022-05-30 14:36:43.517939: clock-in
+
 # 2022-05-30 12:33:47.722462: clock-out
 
 * added point check, rendering on click
