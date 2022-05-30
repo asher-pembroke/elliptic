@@ -1,3 +1,4 @@
+* added point check, rendering on click
 
 # 2022-05-30 10:23:15.467635: clock-in
 

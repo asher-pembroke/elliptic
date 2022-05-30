@@ -12,12 +12,13 @@ external_stylesheets:
   - https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css
 
 external_scripts:
-  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML
+  # - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/latest?tex-mml-chtml.js
 
 app:
   jupyter_dash.JupyterDash:
     external_stylesheets: ${external_stylesheets}
-    external_scripts: # ${external_scripts}
+    external_scripts: ${external_scripts}
     title: elliptic
 
 run_server:
@@ -101,12 +102,17 @@ layout:
             width: 4
             children:
             - ${input_mode}
+            - dcc.Store:
+                id: points
             - dcc.Markdown:
-                id: point-p
+                id: display-points
                 mathjax: True
-            - dcc.Markdown:
-                id: point-q
-                mathjax: True
+            # - dcc.Markdown:
+            #     id: point-p
+            #     mathjax: True
+            # - dcc.Markdown:
+            #     id: point-q
+            #     mathjax: True
 
 
 callbacks:
@@ -118,8 +124,8 @@ callbacks:
         attr: value
       - id: user-input-b
         attr: value
-      - id: curve-graph
-        attr: clickData
+      - id: points
+        attr: data
     output:
       - id: curve-graph
         attr: figure
@@ -135,12 +141,36 @@ callbacks:
         attr: handleLabel
     callback: elliptic.dashboard.update_p_slider_label
 
-  update_p:
+  update_points:
     input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
       - id: curve-graph
         attr: clickData
+    state:
+      - id: points
+        attr: data
     output:
-      - id: point-p
+      - id: points
+        attr: data
+    callback: elliptic.dashboard.update_points
+
+  render_points:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: points
+        attr: data
+    output:
+      - id: display-points
         attr: children
-    callback: elliptic.dashboard.update_point
+    callback: elliptic.dashboard.render_points
 

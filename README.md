@@ -22,6 +22,10 @@ def elliptic(p, a, b):
     return (np.mod(yy**2, p) - np.mod(xx**3+a*xx+b, p) == 0)*1.0
 ```
 
+```python
+
+```
+
 ## Finite elliptic curves
 
 ```python
@@ -746,11 +750,22 @@ if __name__ == '__main__':
 ```
 
 ```python
-from elliptic.dashboard import get_eqn_str
+
 ```
 
 ```python
-get_eqn_str(3, -4, 5)
+
+from elliptic.dashboard import elliptic, point_in_curve
+
+a = elliptic(37, 0, 7)
+```
+
+```python
+
+```
+
+```python
+import numpy as np
 ```
 
 ```python
