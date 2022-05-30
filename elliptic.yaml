@@ -20,6 +20,7 @@ app:
     external_stylesheets: ${external_stylesheets}
     external_scripts: ${external_scripts}
     title: elliptic
+    suppress_callback_exceptions: True
 
 run_server:
   host: '0.0.0.0'
@@ -69,13 +70,19 @@ parameters:
             - ${input_a}
             - ${input_b}
 
-input_mode:
-  dbc.RadioItems:
-    options:
-      - label: add
-        value: 1
-      - label: multiply
-        value: 2
+empty_graph:
+  data: []
+  layout:
+    xaxis:
+      showticklabels: False
+      ticks: ''
+      showgrid: False
+      zeroline: False
+    yaxis:
+      showticklabels: False
+      ticks: ''
+      showgrid: False
+      zeroline: False
 
 layout:
   dbc.Container:
@@ -93,30 +100,55 @@ layout:
             width: 8
             children:
             - ${parameters}
-            - dcc.Graph:
-                id: curve-graph
-                mathjax: True
-                config:
-                  displayModeBar: False
-        - dbc.Col:
-            width: 4
+    - dbc.Tabs:
+        active_tab: point-multiplication
+        children:
+        - dbc.Tab:
+            tab_id: point-addition
+            label: Point Addition
             children:
-            - ${input_mode}
             - dcc.Store:
-                id: points
-            - dcc.Markdown:
-                id: display-points
-                mathjax: True
-            # - dcc.Markdown:
-            #     id: point-p
-            #     mathjax: True
-            # - dcc.Markdown:
-            #     id: point-q
-            #     mathjax: True
-
+                id: add-points
+            - dbc.Card:
+                children:
+                - dbc.CardBody:
+                    children:
+                    - dcc.Graph:
+                        id: add-graph
+                        mathjax: True
+                        config:
+                          displayModeBar: False
+                        figure: ${empty_graph}
+        - dbc.Tab:
+            tab_id: point-multiplication
+            label: Point Multiplication
+            children:
+            - dcc.Store:
+                id: multiply-points
+            - dbc.Card:
+                children:
+                - dbc.CardBody:
+                    children:
+                    - dbc.Row:
+                        children:
+                        - dbc.Col:
+                            width: 3
+                            children:
+                            - dbc.Label: 'n'
+                            - dbc.Input:
+                                id: user-input-n
+                                type: number
+                                value: 0
+                                min: 0
+                    - dcc.Graph:
+                        id: multiply-graph
+                        mathjax: True
+                        config:
+                          displayModeBar: False
+                        figure: ${empty_graph}
 
 callbacks:
-  show_graph:
+  add_graph:
     input:
       - id: user-input-p
         attr: value
@@ -124,13 +156,30 @@ callbacks:
         attr: value
       - id: user-input-b
         attr: value
-      - id: points
+      - id: add-points
         attr: data
     output:
-      - id: curve-graph
+      - id: add-graph
         attr: figure
 
-    callback: elliptic.dashboard.show_graph
+    callback: elliptic.dashboard.add_graph
+
+  multiply_graph:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: user-input-n
+        attr: value
+      - id: multiply-points
+        attr: data
+    output:
+      - id: multiply-graph
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
 
   update_slider_label:
     input:
@@ -141,7 +190,7 @@ callbacks:
         attr: handleLabel
     callback: elliptic.dashboard.update_p_slider_label
 
-  update_points:
+  update_multiply_points:
     input:
       - id: user-input-p
         attr: value
@@ -149,17 +198,19 @@ callbacks:
         attr: value
       - id: user-input-b
         attr: value
-      - id: curve-graph
+      - id: user-input-n
+        attr: value
+      - id: multiply-graph
         attr: clickData
     state:
-      - id: points
+      - id: multiply-points
         attr: data
     output:
-      - id: points
+      - id: multiply-points
         attr: data
-    callback: elliptic.dashboard.update_points
+    callback: elliptic.dashboard.update_multiply_points
 
-  render_points:
+  update_add_points:
     input:
       - id: user-input-p
         attr: value
@@ -167,10 +218,14 @@ callbacks:
         attr: value
       - id: user-input-b
         attr: value
-      - id: points
+      - id: add-graph
+        attr: clickData
+    state:
+      - id: add-points
         attr: data
     output:
-      - id: display-points
-        attr: children
-    callback: elliptic.dashboard.render_points
+      - id: add-points
+        attr: data
+    callback: elliptic.dashboard.update_add_points
+
 

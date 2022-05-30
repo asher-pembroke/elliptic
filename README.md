@@ -751,17 +751,17 @@ if __name__ == '__main__':
 
 ```python
 
-```
-
-```python
-
 from elliptic.dashboard import elliptic, point_in_curve
 
 a = elliptic(37, 0, 7)
 ```
 
 ```python
+P = point_in_curve(5, 24, 37, 0, 7)
+```
 
+```python
+P.x.num
 ```
 
 ```python
