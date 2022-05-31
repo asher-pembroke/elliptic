@@ -1,3 +1,4 @@
+* formatting to fix cutoff
 # 2022-05-30 22:13:49.689656: clock-out
 
 * order and subgroup order - for some reason the subgroup order changes when the base point is fixed

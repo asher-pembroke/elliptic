@@ -100,6 +100,9 @@ def get_pnt_annotation(x, y, text):
         bgcolor="#ff7f0e",
         opacity=0.8)
 
+def point_str(x, y):
+    return "({},{})".format(x,y)
+
 def multiply_graph(p_i, a, b, n, points):
     """multiply points by n"""
     p = primes_[p_i]
@@ -156,7 +159,8 @@ def multiply_graph(p_i, a, b, n, points):
             if len(pts) > 0:
                 order_ = order(p, a, b)
                 subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
-                title_str += f"\quad Order:{order_}, Subgroup Order: {subgroup_order_}"
+                title_str += f"\\newline \quad N:{order_}"
+                title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
 
             for p_ in pts:
                 x_, y_ = p_
