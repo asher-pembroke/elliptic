@@ -133,7 +133,7 @@ def multiply_graph(p_i, a, b, n, points):
 
                 title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
                 if n == 0:
-                    title_str += ' = inf'
+                    title_str += ' = \infty'
 
             if len(pts) == 2: # get second point
                 x_n, y_n = pts[1]
@@ -148,8 +148,15 @@ def multiply_graph(p_i, a, b, n, points):
 
                 if n == 0:
                     pass
+                elif x_n == -1:
+                    title_str += ' = \infty'
                 else:
                     title_str += ' = {}'.format(str((x_n, y_n)))
+
+            if len(pts) > 0:
+                order_ = order(p, a, b)
+                subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
+                title_str += f"\quad Order:{order_}, Subgroup Order: {subgroup_order_}"
 
             for p_ in pts:
                 x_, y_ = p_
@@ -215,7 +222,7 @@ def add_graph(p_i, a, b, points):
                         )
                     fig.add_trace(R_trace)
                 else:
-                    title_str += ' = inf'
+                    title_str += ' = \infty'
         else:
             # print(curve_key, 'not in point store')
             pass
@@ -252,6 +259,8 @@ def update_multiply_points(p_i, a, b, n, clickData, store):
         p_n = n*G_0
         if p_n.x is not None:
             points.append((p_n.x.num, p_n.y.num))
+        else:
+            points.append((-1, -1))
         
     store[curve_key] = points
     return store
@@ -307,4 +316,33 @@ def point_in_curve(x, y, p, a, b):
                 FieldElement(b, p),)
 
 
+order_dict = {} # cache results
+
+def order(p, a, b):
+    """calculate the order of the field including the point at infinity"""
+    if (p,a,b) not in order_dict:
+        order_ = int(elliptic(p, a, b).sum()+1) # brute force
+        order_dict[(p,a,b)] = order_
+    else:
+        order_ = order_dict[(p,a,b)]
+    return order_
+
+def divisors(n):
+    for i in range(1, int(n / 2) + 1):
+        if n % i == 0:
+            yield i
+    yield n
+
+def subgroup_order(P):
+    p = P.x.prime
+    a = P.a.num
+    b = P.b.num
+
+    N = order(p, a, b)
+    
+    for _ in divisors(N):
+        P_ = _*P
+        if P_.x is None:
+            break
+    return _
 

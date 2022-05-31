@@ -22,10 +22,6 @@ def elliptic(p, a, b):
     return (np.mod(yy**2, p) - np.mod(xx**3+a*xx+b, p) == 0)*1.0
 ```
 
-```python
-
-```
-
 ## Finite elliptic curves
 
 ```python
@@ -225,9 +221,7 @@ def divisors(n):
         if n % i == 0:
             yield i
     yield n
-```
 
-```python
 def subgroup_order(P, p, a, b):
     N = order(p, a, b)
     for _ in divisors(N):
@@ -751,7 +745,7 @@ if __name__ == '__main__':
 
 ```python
 
-from elliptic.dashboard import elliptic, point_in_curve
+from elliptic.dashboard import elliptic, point_in_curve, subgroup_order, order
 
 a = elliptic(37, 0, 7)
 ```
@@ -761,7 +755,7 @@ P = point_in_curve(5, 24, 37, 0, 7)
 ```
 
 ```python
-P.x.num
+P.x.prime
 ```
 
 ```python
