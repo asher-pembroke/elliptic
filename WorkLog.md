@@ -1,3 +1,6 @@
+
+# 2022-05-30 22:51:45.220872: clock-in: T-30m 
+
 * formatting to fix cutoff
 # 2022-05-30 22:13:49.689656: clock-out
 
