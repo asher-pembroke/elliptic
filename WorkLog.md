@@ -1,3 +1,4 @@
+* fixed primes bug
 
 # 2022-05-30 22:51:45.220872: clock-in: T-30m 
 

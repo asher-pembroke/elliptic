@@ -744,6 +744,16 @@ if __name__ == '__main__':
 ```
 
 ```python
+from elliptic.dashboard import get_primes
+```
+
+```python
+for i, p in enumerate(get_primes(100)):
+    if p == 37:
+        print(i, p)
+```
+
+```python
 
 from elliptic.dashboard import elliptic, point_in_curve, subgroup_order, order
 

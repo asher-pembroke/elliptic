@@ -38,7 +38,7 @@ input_p:
           id: user-input-p
           min: 3
           max: 100
-          value: 14
+          value: 11
           updatemode: drag
           handleLabel: 'me!'
 

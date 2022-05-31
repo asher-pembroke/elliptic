@@ -9,24 +9,14 @@ sys.path.append('../programmingbitcoin/code-ch03/')
 
 from ecc import Point, FieldElement
 
-def prime(i, primes):
-    for prime in primes:
-        if not (i == prime or i % prime):
-            return False
-    primes.add(i)
-    return i
 
 def get_primes(n):
-    primes = set([2])
-    i, p = 2, 0
-    while True:
-        if prime(i, primes):
-            p += 1
-            if p == n:
-                return primes
-        i += 1
+    from itertools import count, islice
+    primes = (n for n in count(2) if all(n % d for d in range(2, n)))
+    return islice(primes, 0, n)
 
 primes_ = list(get_primes(100))
+
 
 def update_p_slider_label(p_i):
     return str(primes_[p_i])
@@ -119,6 +109,9 @@ def multiply_graph(p_i, a, b, n, points):
 
     title_str = get_eqn_str(p, a, b)
 
+    order_ = order(p, a, b)
+    title_str += f"\quad N:{order_}"
+
     if points is not None:
         curve_key = str((p,a,b))
         if curve_key in points:
@@ -157,9 +150,7 @@ def multiply_graph(p_i, a, b, n, points):
                     title_str += ' = {}'.format(str((x_n, y_n)))
 
             if len(pts) > 0:
-                order_ = order(p, a, b)
                 subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
-                title_str += f"\\newline \quad N:{order_}"
                 title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
 
             for p_ in pts:
