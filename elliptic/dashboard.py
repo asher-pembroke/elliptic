@@ -93,6 +93,33 @@ def get_pnt_annotation(x, y, text):
 def point_str(x, y):
     return "({},{})".format(x,y)
 
+
+def sharing_graph(p_i, a, b, alice_priv, bob_priv):
+    """secret sharing for Alice and Bob"""
+
+    p = primes_[p_i]
+
+    curve = elliptic(p, a, b)
+
+    fig = go.Figure(
+            data=go.Heatmap(z=curve,
+                showscale=False,
+                colorscale='gray',
+                hoverinfo = 'text',
+                text = array_to_str(curve),
+                ),
+            )
+
+    title_str = get_eqn_str(p, a, b)
+
+    fig.update_layout(dict(width=700, height=700,
+                xaxis=dict(range=[0,p-1]),
+                yaxis=dict(range=[0,p-1]),
+                title="$ {} $".format(title_str)))
+
+    return fig
+
+
 def multiply_graph(p_i, a, b, n, points):
     """multiply points by n"""
     p = primes_[p_i]
@@ -340,4 +367,5 @@ def subgroup_order(P):
         if P_.x is None:
             break
     return _
+
 

@@ -395,6 +395,8 @@ Here's a paper on how secp256 generator was randomly selected
 
 https://www.secg.org/sec2-v2.pdf
 
+nobody knows? https://bitcoin.stackexchange.com/questions/113116/how-is-the-generator-point-g-chosen-in-the-secp256k1-curve-used-in-bitcoin
+
 Trick is 
 1. given N choose the subgroup order n to be a prime divisor of N
 1. compute cofactor h = N/n
