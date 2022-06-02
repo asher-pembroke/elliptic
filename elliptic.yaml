@@ -38,7 +38,7 @@ input_p:
           id: user-input-p
           min: 3
           max: 100
-          value: 11
+          value: 11 # 11th prime=37
           updatemode: drag
           handleLabel: 'me!'
 
@@ -101,6 +101,7 @@ layout:
             children:
             - ${parameters}
     - dbc.Tabs:
+        id: lesson
         active_tab: secret-sharing
         children:
         - dbc.Tab:
@@ -169,7 +170,9 @@ layout:
             label: Secret Sharing
             children:
             - dcc.Store:
-                id: sharing-points
+                id: alice-points
+            - dcc.Store:
+                id: bob-points
             - dbc.Card:
                 children:
                 - dbc.CardBody:
@@ -177,32 +180,66 @@ layout:
                     - dbc.Row:
                         children:
                         - dbc.Col:
-                            width: 3
+                            width: 6
                             children:
-                            - dbc.Label:
-                                children: Alice Priv Key
-                            - dbc.Input:
-                                id: alice-priv
-                                type: number
-                                value: 5
-                                min: 1
+                            - dbc.Row:
+                                children:
+                                - dbc.Col:
+                                    width: 6
+                                    children:
+                                    - dbc.Label:
+                                        children: Alice Priv Key
+                                    - dbc.Input:
+                                        id: alice-priv
+                                        type: number
+                                        value: 5
+                                        min: 1
+                                - dbc.Col:
+                                    width: 6
+                                    children:
+                                    - dbc.Label:
+                                        children: Alice Pub Key
                         - dbc.Col:
-                            width: 3
+                            width: 6
                             children:
-                            - dbc.Label:
-                                children: Bob Priv Key
-                            - dbc.Input:
-                                id: bob-priv
-                                type: number
-                                value: 7
-                                min: 1
-
-                    - dcc.Graph:
-                        id: sharing-graph
-                        mathjax: True
-                        config:
-                          displayModeBar: False
-                        figure: ${empty_graph}
+                            - dbc.Row:
+                                children:
+                                - dbc.Col:
+                                    width: 6
+                                    children:
+                                    - dbc.Label:
+                                        children: Bob Priv Key
+                                    - dbc.Input:
+                                        id: bob-priv
+                                        type: number
+                                        value: 7
+                                        min: 1
+                                - dbc.Col:
+                                    width: 6
+                                    children:
+                                    - dbc.Label:
+                                        children: Bob Pub Key
+                    - dbc.Row:
+                        children:
+                          - dbc.Col:
+                              width: 6
+                              children:
+                              - dcc.Graph:
+                                  id: sharing-graph-alice
+                                  mathjax: True
+                                  config:
+                                    displayModeBar: False
+                                  figure: ${empty_graph}
+                          - dbc.Col:
+                              width: 6
+                              children:
+                              - dcc.Graph:
+                                  id: sharing-graph-bob
+                                  mathjax: True
+                                  config:
+                                    displayModeBar: False
+                                  figure: ${empty_graph}
+                              
 
 callbacks:
   add_graph:
@@ -247,6 +284,83 @@ callbacks:
         attr: handleLabel
     callback: elliptic.dashboard.update_p_slider_label
 
+
+  update_alice_points:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv
+        attr: value
+      - id: sharing-graph-alice
+        attr: clickData
+    state:
+      - id: alice-points
+        attr: data
+    output:
+      - id: alice-points
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  sharing_graph_alice:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv
+        attr: value
+      - id: alice-points
+        attr: data
+    output:
+      - id: sharing-graph-alice
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
+
+
+  update_bob_points:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: bob-priv
+        attr: value
+      - id: sharing-graph-bob
+        attr: clickData
+    state:
+      - id: bob-points
+        attr: data
+    output:
+      - id: bob-points
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+
+  sharing_graph_bob:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: bob-priv
+        attr: value
+      - id: bob-points
+        attr: data
+    output:
+      - id: sharing-graph-bob
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
+
   update_multiply_points:
     input:
       - id: user-input-p
@@ -284,19 +398,6 @@ callbacks:
       - id: add-points
         attr: data
     callback: elliptic.dashboard.update_add_points
-
-  sharing_graph:
-    input:
-      - id: user-input-p
-        attr: value
-      - id: user-input-a
-        attr: value
-      - id: user-input-b
-        attr: value
-    output:
-      - id: sharing-graph
-        attr: figure
-    callback: elliptic.dashboard.sharing_graph
 
 
 

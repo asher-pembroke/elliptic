@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import numpy as np
 
 from dash.exceptions import PreventUpdate
-
+import dash
 import sys
 
 sys.path.append('../programmingbitcoin/code-ch03/')
@@ -64,9 +64,9 @@ def array_to_str(arr):
                 result.append('')
     return np.array(result).reshape(arr.shape)
 
-def get_p_size(p_i, size_min = 1, size_max = 30):
-    """scale to 15 when p_i = 14"""
-    return int(np.interp(p_i, [3, 14, 100], [size_max, 15, size_min]))
+def get_p_size(p_i, index_mid=11, size_min=1, size_mid=15, size_max=30):
+    """scale to size_mid when p_i = index_mid"""
+    return int(np.interp(p_i, [3, index_mid, 100], [size_max, size_mid, size_min]))
 
 
 def get_pnt_annotation(x, y, text):
@@ -94,34 +94,16 @@ def point_str(x, y):
     return "({},{})".format(x,y)
 
 
-def sharing_graph(p_i, a, b, alice_priv, bob_priv):
-    """secret sharing for Alice and Bob"""
-
-    p = primes_[p_i]
-
-    curve = elliptic(p, a, b)
-
-    fig = go.Figure(
-            data=go.Heatmap(z=curve,
-                showscale=False,
-                colorscale='gray',
-                hoverinfo = 'text',
-                text = array_to_str(curve),
-                ),
-            )
-
-    title_str = get_eqn_str(p, a, b)
-
-    fig.update_layout(dict(width=700, height=700,
-                xaxis=dict(range=[0,p-1]),
-                yaxis=dict(range=[0,p-1]),
-                title="$ {} $".format(title_str)))
-
-    return fig
-
-
 def multiply_graph(p_i, a, b, n, points):
     """multiply points by n"""
+    ctx = dash.callback_context
+
+    if 'sharing' in ctx.outputs_list['id']:
+        active_tab = 'secret-sharing'
+    if 'multiply' in ctx.outputs_list['id']:
+        active_tab = 'point-multiplication'
+
+
     p = primes_[p_i]
     curve = elliptic(p, a, b)
 
@@ -134,10 +116,18 @@ def multiply_graph(p_i, a, b, n, points):
                 ),
             )
 
-    title_str = get_eqn_str(p, a, b)
+    title_str = ''
+
+    if active_tab == 'point-multiplication':
+        title_str += get_eqn_str(p, a, b)
+
+    if active_tab == 'secret-sharing':
+        title_str += '\\textrm{'+'Shared Secret'+'}:'
 
     order_ = order(p, a, b)
-    title_str += f"\quad N:{order_}"
+
+    if active_tab == 'point-multiplication':
+        title_str += f"\quad N:{order_}"
 
     if points is not None:
         curve_key = str((p,a,b))
@@ -153,8 +143,11 @@ def multiply_graph(p_i, a, b, n, points):
                     mode='markers',
                     showlegend=False,)
                 fig.add_trace(base_point)
+                if active_tab == 'point-multiplication':
+                    title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
+                elif active_tab == 'secret-sharing':
+                    title_str += '\quad {} \cdot {}'.format(str(n), str((x_0, y_0)))
 
-                title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
                 if n == 0:
                     title_str += ' = \infty'
 
@@ -178,16 +171,24 @@ def multiply_graph(p_i, a, b, n, points):
 
             if len(pts) > 0:
                 subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
-                title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
+
+                if active_tab == 'point-multiplication':
+                    title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
 
             for p_ in pts:
                 x_, y_ = p_
                 fig.add_annotation(**get_pnt_annotation(x_, y_, str((x_, y_))))
 
-    fig.update_layout(dict(width=700, height=700,
+    fig.update_layout(dict(
                 xaxis=dict(range=[0,p-1]),
                 yaxis=dict(range=[0,p-1]),
                 title="$ {} $".format(title_str)))
+
+    if active_tab == 'secret-sharing':
+        fig.update_layout(width=600, height=600)
+    else:
+        fig.update_layout(width=700, height=700)
+
     return fig
 
 def add_graph(p_i, a, b, points):
