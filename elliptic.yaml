@@ -197,8 +197,17 @@ layout:
                                 - dbc.Col:
                                     width: 6
                                     children:
-                                    - dbc.Label:
-                                        children: Alice Pub Key
+                                    - dbc.RadioItems:
+                                        id: 'alice-shared-mode'
+                                        options:
+                                        - label: 'Generate Pub Key'
+                                          value: 1
+                                        - label: 'Generate Shared Secret'
+                                          value: 2
+                                        - label: 'Encrypt'
+                                          value: 3
+                                        value: 1
+                                        inline: True
                         - dbc.Col:
                             width: 6
                             children:
@@ -217,8 +226,17 @@ layout:
                                 - dbc.Col:
                                     width: 6
                                     children:
-                                    - dbc.Label:
-                                        children: Bob Pub Key
+                                    - dbc.RadioItems:
+                                        id: bob-shared-mode
+                                        options:
+                                        - label: 'Generate Pub Key'
+                                          value: 1
+                                        - label: 'Generate Shared Secret'
+                                          value: 2
+                                        - label: 'Encrypt'
+                                          value: 3
+                                        value: 1
+                                        inline: True
                     - dbc.Row:
                         children:
                           - dbc.Col:

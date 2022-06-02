@@ -1,3 +1,4 @@
+* run script, shared secret options
 
 # 2022-06-02 15:59:17.924659: clock-in
 
