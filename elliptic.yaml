@@ -20,7 +20,7 @@ app:
     external_stylesheets: ${external_stylesheets}
     external_scripts: ${external_scripts}
     title: elliptic
-    suppress_callback_exceptions: True
+    suppress_callback_exceptions: False
 
 run_server:
   host: '0.0.0.0'
@@ -100,6 +100,7 @@ layout:
             width: 8
             children:
             - ${parameters}
+    - html.Br:
     - dbc.Tabs:
         id: lesson
         active_tab: secret-sharing
@@ -189,6 +190,24 @@ layout:
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
+                                    width: 12
+                                    children:
+                                    - dbc.RadioItems:
+                                        id: alice-sharing-mode
+                                        options:
+                                        - label: 'Pub Key'
+                                          value: 1
+                                        - label: 'Shared Secret'
+                                          value: 2
+                                        - label: 'Encrypt'
+                                          value: 3
+                                        - label: 'Decrypt'
+                                          value: 4 
+                                        value: 1
+                                        inline: True
+                            - dbc.Row:
+                                children:
+                                - dbc.Col:
                                     width: 3
                                     children:
                                     - dbc.Label:
@@ -212,23 +231,27 @@ layout:
                                         children: Shared Secret
                                     - dcc.Markdown:
                                         id: alice-shared-secret
+                        - dbc.Col:
+                            width: 6
+                            children:
+                            - dbc.Row:
+                                children:
                                 - dbc.Col:
-                                    width: 3
+                                    width: 12
                                     children:
                                     - dbc.RadioItems:
-                                        id: alice-sharing-mode
+                                        id: bob-sharing-mode
                                         options:
                                         - label: 'Pub Key'
                                           value: 1
                                         - label: 'Shared Secret'
                                           value: 2
-                                        # - label: 'Encrypt'
-                                        #   value: 3
+                                        - label: 'Encrypt'
+                                          value: 3
+                                        - label: 'Decrypt'
+                                          value: 4
                                         value: 1
                                         inline: True
-                        - dbc.Col:
-                            width: 6
-                            children:
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
@@ -255,20 +278,6 @@ layout:
                                         children: Shared Secret
                                     - dcc.Markdown:
                                         id: bob-shared-secret
-                                - dbc.Col:
-                                    width: 3
-                                    children:
-                                    - dbc.RadioItems:
-                                        id: bob-sharing-mode
-                                        options:
-                                        - label: 'Pub Key'
-                                          value: 1
-                                        - label: 'Shared Secret'
-                                          value: 2
-                                        # - label: 'Encrypt'
-                                        #   value: 3
-                                        value: 1
-                                        inline: True
                     - dbc.Row:
                         children:
                           - dbc.Col:
@@ -292,6 +301,27 @@ layout:
                                       config:
                                         displayModeBar: False
                                       figure: ${empty_graph}
+                              - html.Div:
+                                  id: encrypt-alice-outer
+                                  children:
+                                  - html.Br:
+                                  - dbc.Input:
+                                      id: alice-message
+                                      placeholder: put your secrets here
+                                      type: text
+                                      value: My name is Alice
+                                  - dbc.Textarea:
+                                      id: alice-encrypted
+                                      value:
+                                      placeholder: Shared secret required
+                                      style:
+                                        height: 135
+                                  - dbc.Button:
+                                      id: alice-send
+                                      children: Send
+                                      color: primary
+
+
                           - dbc.Col:
                               width: 6
                               children:
@@ -313,6 +343,25 @@ layout:
                                       config:
                                         displayModeBar: False
                                       figure: ${empty_graph}
+                              - html.Div:
+                                  id: encrypt-bob-outer
+                                  children:
+                                  - html.Br:
+                                  - dbc.Input:
+                                      id: bob-message
+                                      placeholder: put your secrets here
+                                      type: text
+                                      value: My name is Bob
+                                  - dbc.Textarea:
+                                      id: bob-encrypted
+                                      value:
+                                      placeholder: Shared secret required
+                                      style:
+                                        height: 135
+                                  - dbc.Button:
+                                      id: bob-send
+                                      children: Send
+                                      color: primary
                               
 
 callbacks:
@@ -481,6 +530,46 @@ callbacks:
         attr: data
     callback: elliptic.dashboard.update_multiply_points
 
+  update_alice_priv_bounds:
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: pub-graph-alice
+      attr: clickData
+    state:
+    - id: alice-priv
+      attr: value
+    output:
+    - id: alice-priv
+      attr: max
+    - id: alice-priv
+      attr: value
+    callback: elliptic.dashboard.priv_in_bounds
+
+  update_bob_priv_bounds:
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: pub-graph-bob
+      attr: clickData
+    state:
+    - id: bob-priv
+      attr: value
+    output:
+    - id: bob-priv
+      attr: max
+    - id: bob-priv
+      attr: value
+    callback: elliptic.dashboard.priv_in_bounds
+
   pub_graph_alice:
     input:
       - id: user-input-p
@@ -557,6 +646,16 @@ callbacks:
     callback: elliptic.dashboard.show_hide_secret
 
 
+  show_hide_alice_encrypt:
+    input:
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id:  encrypt-alice-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_encrypt
+
+
   show_hide_bob_pub:
     input:
       - id: bob-sharing-mode
@@ -574,6 +673,15 @@ callbacks:
       - id:  secret-graph-bob-outer
         attr: style
     callback: elliptic.dashboard.show_hide_secret
+
+  show_hide_bob_encrypt:
+    input:
+      - id: bob-sharing-mode
+        attr: value
+    output:
+      - id:  encrypt-bob-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_encrypt
 
   update_bob_pub:
     input:
@@ -654,5 +762,27 @@ callbacks:
     callback: elliptic.dashboard.update_add_points
 
 
+  encrypt_alice_message:
+    input:
+      - id: alice-shared-secret
+        attr: children
+      - id: alice-message
+        attr: value
+    output:
+      - id: alice-encrypted
+        attr: value
+    callback: elliptic.dashboard.encrypt
+
+
+  encrypt_bob_message:
+    input:
+      - id: bob-shared-secret
+        attr: children
+      - id: bob-message
+        attr: value
+    output:
+      - id: bob-encrypted
+        attr: value
+    callback: elliptic.dashboard.encrypt
 
 

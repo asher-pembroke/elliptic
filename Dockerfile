@@ -25,6 +25,7 @@ RUN pip install plotly dash jupyter-dash
 RUN pip install numpy
 RUN pip install dash-bootstrap-components
 RUN pip install dash_daq
+RUN pip install cryptography
 
 RUN git clone https://github.com/jimmysong/programmingbitcoin.git /home/programmingbitcoin
 

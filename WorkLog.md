@@ -1,3 +1,4 @@
+* added encryption
 
 # 2022-06-03 14:16:05.355223: clock-in
 

@@ -6,6 +6,15 @@ import dash
 import sys
 import logging
 
+from cryptography.fernet import Fernet
+import base64
+
+logging.basicConfig(filename='elliptic.log',
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
+
 sys.path.append('../programmingbitcoin/code-ch03/')
 
 from ecc import Point, FieldElement
@@ -108,6 +117,12 @@ def show_hide_secret(mode):
     else:
         return dict(display='none')
 
+def show_hide_encrypt(mode):
+    # show the secret key 
+    if mode == 3:
+        return dict(display='block')
+    else:
+        return dict(display='none')
 
 
 def multiply_graph(p_i, a, b, n, points, *args):
@@ -118,8 +133,6 @@ def multiply_graph(p_i, a, b, n, points, *args):
         sharing_mode = args[0]
     else:
         sharing_mode = None # multiply tab
-
-    logging.debug('additional args', args)
 
     if 'multiply' not in ctx.outputs_list['id']:
         active_tab = 'secret-sharing'
@@ -218,6 +231,25 @@ def multiply_graph(p_i, a, b, n, points, *args):
         fig.update_layout(width=700, height=700)
 
     return fig
+
+def priv_in_bounds(p_i, a, b, clickData, current_priv):
+    """set bounds of the private key"""
+    p = primes_[p_i]
+    max_val = order(p, a, b)
+
+    logging.debug('max val: {}'.format(max_val))
+
+    if clickData is not None:
+        # replace the first point
+        p_0 = clickData['points'][0]
+        x_0, y_0 = p_0['x'], p_0['y']
+
+        G_0 = point_in_curve(x_0, y_0, p, a, b)
+        max_val = subgroup_order(G_0) - 1
+    logging.debug('max val of priv key: {}'.format(max_val))
+    current_priv = min(current_priv, max_val)
+    return max_val, current_priv
+
 
 def add_graph(p_i, a, b, points):
     """add points on click"""
@@ -407,5 +439,26 @@ def subgroup_order(P):
         if P_.x is None:
             break
     return _
+
+
+
+def encrypt(key, message):
+    # Fernet(base64.urlsafe_b64encode(b'(3,4)'.ljust(32)))
+    if message is None:
+        raise PreventUpdate
+
+    if key == '':
+        raise PreventUpdate
+
+    key_str = str(key)
+    logging.debug('key str:{}'.format(key_str))
+
+    fernet_key = base64.urlsafe_b64encode(bytes(key_str.ljust(32).encode()))
+    f = Fernet(fernet_key)
+    token = f.encrypt(message.encode())
+
+    encrypted_msg = str(token)
+
+    return encrypted_msg
 
 
