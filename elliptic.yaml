@@ -170,9 +170,13 @@ layout:
             label: Secret Sharing
             children:
             - dcc.Store:
-                id: alice-points
+                id: alice-pub
             - dcc.Store:
-                id: bob-points
+                id: alice-secret
+            - dcc.Store:
+                id: bob-pub
+            - dcc.Store:
+                id: bob-secret
             - dbc.Card:
                 children:
                 - dbc.CardBody:
@@ -185,7 +189,7 @@ layout:
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
-                                    width: 6
+                                    width: 3
                                     children:
                                     - dbc.Label:
                                         children: Alice Priv Key
@@ -195,17 +199,31 @@ layout:
                                         value: 5
                                         min: 1
                                 - dbc.Col:
-                                    width: 6
+                                    width: 3
+                                    children:
+                                    - dbc.Label:
+                                        children: Alice Pub Key
+                                    - dcc.Markdown:
+                                        id: alice-pub-key
+                                - dbc.Col:
+                                    width: 3
+                                    children:
+                                    - dbc.Label:
+                                        children: Shared Secret
+                                    - dcc.Markdown:
+                                        id: alice-shared-secret
+                                - dbc.Col:
+                                    width: 3
                                     children:
                                     - dbc.RadioItems:
-                                        id: 'alice-shared-mode'
+                                        id: alice-sharing-mode
                                         options:
-                                        - label: 'Generate Pub Key'
+                                        - label: 'Pub Key'
                                           value: 1
-                                        - label: 'Generate Shared Secret'
+                                        - label: 'Shared Secret'
                                           value: 2
-                                        - label: 'Encrypt'
-                                          value: 3
+                                        # - label: 'Encrypt'
+                                        #   value: 3
                                         value: 1
                                         inline: True
                         - dbc.Col:
@@ -214,7 +232,7 @@ layout:
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
-                                    width: 6
+                                    width: 3
                                     children:
                                     - dbc.Label:
                                         children: Bob Priv Key
@@ -224,17 +242,31 @@ layout:
                                         value: 7
                                         min: 1
                                 - dbc.Col:
-                                    width: 6
+                                    width: 3
+                                    children:
+                                    - dbc.Label:
+                                        children: Bob Pub Key
+                                    - dcc.Markdown:
+                                        id: bob-pub-key
+                                - dbc.Col:
+                                    width: 3
+                                    children:
+                                    - dbc.Label:
+                                        children: Shared Secret
+                                    - dcc.Markdown:
+                                        id: bob-shared-secret
+                                - dbc.Col:
+                                    width: 3
                                     children:
                                     - dbc.RadioItems:
-                                        id: bob-shared-mode
+                                        id: bob-sharing-mode
                                         options:
-                                        - label: 'Generate Pub Key'
+                                        - label: 'Pub Key'
                                           value: 1
-                                        - label: 'Generate Shared Secret'
+                                        - label: 'Shared Secret'
                                           value: 2
-                                        - label: 'Encrypt'
-                                          value: 3
+                                        # - label: 'Encrypt'
+                                        #   value: 3
                                         value: 1
                                         inline: True
                     - dbc.Row:
@@ -242,21 +274,45 @@ layout:
                           - dbc.Col:
                               width: 6
                               children:
-                              - dcc.Graph:
-                                  id: sharing-graph-alice
-                                  mathjax: True
-                                  config:
-                                    displayModeBar: False
-                                  figure: ${empty_graph}
+                              - html.Div:
+                                  id: pub-graph-alice-outer
+                                  children:
+                                  - dcc.Graph:
+                                      id: pub-graph-alice
+                                      mathjax: True
+                                      config:
+                                        displayModeBar: False
+                                      figure: ${empty_graph}
+                              - html.Div:
+                                  id: secret-graph-alice-outer
+                                  children:
+                                  - dcc.Graph:
+                                      id: secret-graph-alice
+                                      mathjax: True
+                                      config:
+                                        displayModeBar: False
+                                      figure: ${empty_graph}
                           - dbc.Col:
                               width: 6
                               children:
-                              - dcc.Graph:
-                                  id: sharing-graph-bob
-                                  mathjax: True
-                                  config:
-                                    displayModeBar: False
-                                  figure: ${empty_graph}
+                              - html.Div:
+                                  id: pub-graph-bob-outer
+                                  children:
+                                  - dcc.Graph:
+                                      id: pub-graph-bob
+                                      mathjax: True
+                                      config:
+                                        displayModeBar: False
+                                      figure: ${empty_graph}
+                              - html.Div:
+                                  id: secret-graph-bob-outer
+                                  children:
+                                  - dcc.Graph:
+                                      id: secret-graph-bob
+                                      mathjax: True
+                                      config:
+                                        displayModeBar: False
+                                      figure: ${empty_graph}
                               
 
 callbacks:
@@ -303,7 +359,7 @@ callbacks:
     callback: elliptic.dashboard.update_p_slider_label
 
 
-  update_alice_points:
+  update_bob_secret:
     input:
       - id: user-input-p
         attr: value
@@ -311,19 +367,20 @@ callbacks:
         attr: value
       - id: user-input-b
         attr: value
-      - id: alice-priv
+      - id: bob-priv
         attr: value
-      - id: sharing-graph-alice
+      - id: secret-graph-bob
         attr: clickData
     state:
-      - id: alice-points
+      - id: bob-secret
         attr: data
     output:
-      - id: alice-points
+      - id: bob-secret
         attr: data
     callback: elliptic.dashboard.update_multiply_points
 
-  sharing_graph_alice:
+
+  update_alice_secret:
     input:
       - id: user-input-p
         attr: value
@@ -333,15 +390,136 @@ callbacks:
         attr: value
       - id: alice-priv
         attr: value
-      - id: alice-points
+      - id: secret-graph-alice
+        attr: clickData
+    state:
+      - id: alice-secret
         attr: data
     output:
-      - id: sharing-graph-alice
+      - id: alice-secret
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  render_alice_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-pub
+        attr: data
+    output:
+      - id: alice-pub-key
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+  render_alice_secret:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-secret
+        attr: data
+    output:
+      - id: alice-shared-secret
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+
+  render_bob_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: bob-pub
+        attr: data
+    output:
+      - id: bob-pub-key
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+  render_bob_secret:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: bob-secret
+        attr: data
+    output:
+      - id: bob-shared-secret
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+  update_alice_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv
+        attr: value
+      - id: pub-graph-alice
+        attr: clickData
+    state:
+      - id: alice-pub
+        attr: data
+    output:
+      - id: alice-pub
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  pub_graph_alice:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv
+        attr: value
+      - id: alice-pub
+        attr: data
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id: pub-graph-alice
         attr: figure
     callback: elliptic.dashboard.multiply_graph
 
+  secret_graph_alice:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv
+        attr: value
+      - id: alice-secret
+        attr: data
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id: secret-graph-alice
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
 
-  update_bob_points:
+  secret_graph_bob:
     input:
       - id: user-input-p
         attr: value
@@ -351,18 +529,74 @@ callbacks:
         attr: value
       - id: bob-priv
         attr: value
-      - id: sharing-graph-bob
+      - id: bob-secret
+        attr: data
+      - id: bob-sharing-mode
+        attr: value
+    output:
+      - id: secret-graph-bob
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
+
+  show_hide_alice_pub:
+    input:
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id:  pub-graph-alice-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_pub
+
+  show_hide_alice_secret:
+    input:
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id:  secret-graph-alice-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_secret
+
+
+  show_hide_bob_pub:
+    input:
+      - id: bob-sharing-mode
+        attr: value
+    output:
+      - id:  pub-graph-bob-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_pub
+
+  show_hide_bob_secret:
+    input:
+      - id: bob-sharing-mode
+        attr: value
+    output:
+      - id:  secret-graph-bob-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_secret
+
+  update_bob_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: bob-priv
+        attr: value
+      - id: pub-graph-bob
         attr: clickData
     state:
-      - id: bob-points
+      - id: bob-pub
         attr: data
     output:
-      - id: bob-points
+      - id: bob-pub
         attr: data
     callback: elliptic.dashboard.update_multiply_points
 
 
-  sharing_graph_bob:
+  pub_graph_bob:
     input:
       - id: user-input-p
         attr: value
@@ -372,10 +606,12 @@ callbacks:
         attr: value
       - id: bob-priv
         attr: value
-      - id: bob-points
+      - id: bob-pub
         attr: data
+      - id: bob-sharing-mode
+        attr: value
     output:
-      - id: sharing-graph-bob
+      - id: pub-graph-bob
         attr: figure
     callback: elliptic.dashboard.multiply_graph
 

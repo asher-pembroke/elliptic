@@ -4,6 +4,7 @@ import numpy as np
 from dash.exceptions import PreventUpdate
 import dash
 import sys
+import logging
 
 sys.path.append('../programmingbitcoin/code-ch03/')
 
@@ -93,12 +94,34 @@ def get_pnt_annotation(x, y, text):
 def point_str(x, y):
     return "({},{})".format(x,y)
 
+def show_hide_pub(mode):
+    # show the pub key
+    if mode == 1:
+        return dict(display='block')
+    else:
+        return dict(display='none')
 
-def multiply_graph(p_i, a, b, n, points):
+def show_hide_secret(mode):
+    # show the secret key 
+    if mode == 2:
+        return dict(display='block')
+    else:
+        return dict(display='none')
+
+
+
+def multiply_graph(p_i, a, b, n, points, *args):
     """multiply points by n"""
     ctx = dash.callback_context
 
-    if 'sharing' in ctx.outputs_list['id']:
+    if len(args) > 0:
+        sharing_mode = args[0]
+    else:
+        sharing_mode = None # multiply tab
+
+    logging.debug('additional args', args)
+
+    if 'multiply' not in ctx.outputs_list['id']:
         active_tab = 'secret-sharing'
     if 'multiply' in ctx.outputs_list['id']:
         active_tab = 'point-multiplication'
@@ -122,7 +145,12 @@ def multiply_graph(p_i, a, b, n, points):
         title_str += get_eqn_str(p, a, b)
 
     if active_tab == 'secret-sharing':
-        title_str += '\\textrm{'+'Shared Secret'+'}:'
+        if sharing_mode == 1:
+            title_str += '\\textrm{'+'Public Key'+'}:'
+        elif sharing_mode == 2:
+            title_str += '\\textrm{'+'Shared Secret'+'}:'
+        elif sharing_mode == 3:
+            pass
 
     order_ = order(p, a, b)
 
@@ -320,6 +348,17 @@ def update_add_points(p_i, a, b, clickData, store):
     store[curve_key] = points[-2:] # keep the last two points
 
     return store
+
+def render_pub_key(p_i, a, b, points):
+    p = primes_[p_i]
+    points_str = ''
+    if points is not None:
+        curve_key = str((p,a,b))
+        if curve_key in points:
+            if len(points[curve_key]) == 2:
+                pubkey = points[curve_key][-1]
+                points_str = '**({},{})**'.format(*pubkey)
+    return points_str
 
 def render_points(p_i, a, b, points):
     p = primes_[p_i]
