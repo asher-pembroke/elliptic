@@ -362,6 +362,16 @@ layout:
                                       id: bob-send
                                       children: Send
                                       color: primary
+                              - html.Div:
+                                  id: decrypt-bob-outer
+                                  children:
+                                  - html.Br:
+                                  - dbc.Textarea:
+                                      id: bob-decrypt
+                                      value:
+                                      placeholder: Decrypt message here
+                                      style:
+                                        height: 135
                               
 
 callbacks:
@@ -682,6 +692,15 @@ callbacks:
       - id:  encrypt-bob-outer
         attr: style
     callback: elliptic.dashboard.show_hide_encrypt
+
+  show_hide_bob_decrypt:
+    input:
+      - id: bob-sharing-mode
+        attr: value
+    output:
+      - id:  decrypt-bob-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_decrypt
 
   update_bob_pub:
     input:

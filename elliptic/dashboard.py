@@ -124,6 +124,13 @@ def show_hide_encrypt(mode):
     else:
         return dict(display='none')
 
+def show_hide_decrypt(mode):
+    # show the secret key 
+    if mode == 4:
+        return dict(display='block')
+    else:
+        return dict(display='none')
+
 
 def multiply_graph(p_i, a, b, n, points, *args):
     """multiply points by n"""
