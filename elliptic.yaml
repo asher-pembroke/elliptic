@@ -199,10 +199,8 @@ layout:
                                           value: 1
                                         - label: 'Shared Secret'
                                           value: 2
-                                        - label: 'Encrypt'
+                                        - label: 'Message'
                                           value: 3
-                                        - label: 'Decrypt'
-                                          value: 4 
                                         value: 1
                                         inline: True
                             - dbc.Row:
@@ -246,10 +244,8 @@ layout:
                                           value: 1
                                         - label: 'Shared Secret'
                                           value: 2
-                                        - label: 'Encrypt'
+                                        - label: 'Message'
                                           value: 3
-                                        - label: 'Decrypt'
-                                          value: 4
                                         value: 1
                                         inline: True
                             - dbc.Row:
@@ -305,38 +301,39 @@ layout:
                                   id: encrypt-alice-outer
                                   children:
                                   - html.Br:
-                                  - dbc.Input:
+                                  - dbc.Textarea:
                                       id: alice-message
-                                      placeholder: put your secrets here
-                                      type: text
-                                      value: My name is Alice
-                                  - dbc.Textarea:
-                                      id: alice-encrypted
                                       value:
-                                      placeholder: Shared secret required
+                                      placeholder: Enter message to send/encrypt
                                       style:
                                         height: 135
-                                  - dbc.Button:
-                                      id: alice-send
-                                      children: Send
-                                      color: primary
-                              - html.Div:
-                                  id: decrypt-alice-outer
-                                  children:
                                   - html.Br:
-                                  - dbc.Textarea:
-                                      id: alice-decrypt
-                                      value:
-                                      placeholder: Receive encrypted message here
-                                      style:
-                                        height: 135
-                                  - dbc.Input:
-                                      id: alice-decrypted
-                                      placeholder: Decrypted message here
-                                      type: text
-                                      value:
-
-
+                                  - dbc.Row:
+                                      justify: center
+                                      children:
+                                        - dbc.Col:
+                                            width: 3
+                                            children:
+                                            - html.Div:
+                                                id: alice-error
+                                                children:
+                                        - dbc.Col:
+                                            width: 4
+                                            children:
+                                            - dbc.ButtonGroup:
+                                                children:
+                                                - dbc.Button:
+                                                    id: alice-encrypt
+                                                    children: Encrypt
+                                                    color: primary
+                                                - dbc.Button:
+                                                    id: alice-decrypt
+                                                    children: Decrypt
+                                                    color: primary
+                                                - dbc.Button:
+                                                    id: alice-send
+                                                    children: Send
+                                                    color: success
                           - dbc.Col:
                               width: 6
                               children:
@@ -362,36 +359,40 @@ layout:
                                   id: encrypt-bob-outer
                                   children:
                                   - html.Br:
-                                  - dbc.Input:
+                                  - dbc.Textarea:
                                       id: bob-message
-                                      placeholder: put your secrets here
-                                      type: text
-                                      value: My name is Bob
-                                  - dbc.Textarea:
-                                      id: bob-encrypted
                                       value:
-                                      placeholder: Shared secret required
+                                      placeholder: Enter message to send/encrypt
                                       style:
                                         height: 135
-                                  - dbc.Button:
-                                      id: bob-send
-                                      children: Send
-                                      color: primary
-                              - html.Div:
-                                  id: decrypt-bob-outer
-                                  children:
                                   - html.Br:
-                                  - dbc.Textarea:
-                                      id: bob-decrypt
-                                      value:
-                                      placeholder: Receive encrypted message here
-                                      style:
-                                        height: 135
-                                  - dbc.Input:
-                                      id: bob-decrypted
-                                      placeholder: Decrypted message here
-                                      type: text
-                                      value:
+                                  - dbc.Row:
+                                      justify: center
+                                      children:
+                                        - dbc.Col:
+                                            width: 3
+                                            children:
+                                            - html.Div:
+                                                id: bob-error
+                                                children:
+                                        - dbc.Col:
+                                            width: 4
+                                            children:
+                                            - dbc.ButtonGroup:
+                                                children:
+                                                - dbc.Button:
+                                                    id: bob-encrypt
+                                                    children: Encrypt
+                                                    color: primary
+                                                - dbc.Button:
+                                                    id: bob-decrypt
+                                                    children: Decrypt
+                                                    color: secondary
+                                                - dbc.Button:
+                                                    id: bob-send
+                                                    children: Send
+                                                    color: success
+
 
 callbacks:
   add_graph:
@@ -712,24 +713,6 @@ callbacks:
         attr: style
     callback: elliptic.dashboard.show_hide_encrypt
 
-  show_hide_bob_decrypt:
-    input:
-      - id: bob-sharing-mode
-        attr: value
-    output:
-      - id:  decrypt-bob-outer
-        attr: style
-    callback: elliptic.dashboard.show_hide_decrypt
-
-  show_hide_alice_decrypt:
-    input:
-      - id: alice-sharing-mode
-        attr: value
-    output:
-      - id:  decrypt-alice-outer
-        attr: style
-    callback: elliptic.dashboard.show_hide_decrypt
-
   update_bob_pub:
     input:
       - id: user-input-p
@@ -809,84 +792,72 @@ callbacks:
     callback: elliptic.dashboard.update_add_points
 
 
-  encrypt_alice_message:
+  update_message_alice:
     input:
       - id: alice-shared-secret
         attr: children
-      - id: alice-message
-        attr: value
-    output:
-      - id: alice-encrypted
-        attr: value
-    callback: elliptic.dashboard.encrypt
-
-  alice_send:
-    input:
-      - id: alice-send
+      - id: alice-encrypt
         attr: n_clicks
-    state:
-      - id: alice-encrypted
-        attr: value
-    output:
-      - id: bob-decrypt
-        attr: value
-    callback: elliptic.dashboard.send
-
-  encrypt_bob_message:
-    input:
-      - id: bob-shared-secret
-        attr: children
-      - id: bob-message
-        attr: value
-    output:
-      - id: bob-encrypted
-        attr: value
-    callback: elliptic.dashboard.encrypt
-
-  bob_send:
-    input:
+      - id: alice-decrypt
+        attr: n_clicks
       - id: bob-send
         attr: n_clicks
     state:
-      - id: bob-encrypted
+      - id: bob-message
+        attr: value
+      - id: alice-message
         attr: value
     output:
-      - id: alice-decrypt
+      - id: alice-message
         attr: value
-    callback: elliptic.dashboard.send
+      - id: alice-error
+        attr: children
+    callback: elliptic.dashboard.update_message
 
 
-  encrypt_bob_message:
+  update_message_bob:
     input:
       - id: bob-shared-secret
         attr: children
+      - id: bob-encrypt
+        attr: n_clicks
+      - id: bob-decrypt
+        attr: n_clicks
+      - id: alice-send
+        attr: n_clicks
+    state:
+      - id: alice-message
+        attr: value
       - id: bob-message
         attr: value
     output:
-      - id: bob-encrypted
+      - id: bob-message
         attr: value
-    callback: elliptic.dashboard.encrypt
-
-
-  bob_decrypt:
-    input:
-      - id: bob-shared-secret
+      - id: bob-error
         attr: children
-      - id: bob-decrypt
-        attr: value
-    output:
-      - id: bob-decrypted
-        attr: value
-    callback: elliptic.dashboard.decrypt
+    callback: elliptic.dashboard.update_message
 
-  alice_decrypt:
+  update_alice_buttons:
     input:
       - id: alice-shared-secret
         attr: children
-      - id: alice-decrypt
-        attr: value
     output:
-      - id: alice-decrypted
-        attr: value
-    callback: elliptic.dashboard.decrypt
+      - id: alice-encrypt
+        attr: color
+      - id: alice-decrypt
+        attr: color
+    callback: elliptic.dashboard.update_crypto_buttons
+
+
+  update_bob_buttons:
+    input:
+      - id: bob-shared-secret
+        attr: children
+    output:
+      - id: bob-encrypt
+        attr: color
+      - id: bob-decrypt
+        attr: color
+    callback: elliptic.dashboard.update_crypto_buttons
+
 

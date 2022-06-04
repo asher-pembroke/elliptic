@@ -6,8 +6,11 @@ import dash
 import sys
 import logging
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import base64
+import json
+
+
 
 logging.basicConfig(filename='elliptic.log',
                     filemode='a',
@@ -275,6 +278,8 @@ def add_graph(p_i, a, b, points):
 
     title_str = get_eqn_str(p, a, b)
 
+    title_str += f"\quad N:{order(p, a, b)}"
+
     if points is not None:
         curve_key = str((p,a,b))
         if curve_key in points:
@@ -411,10 +416,13 @@ def render_points(p_i, a, b, points):
             return points_str
 
 def point_in_curve(x, y, p, a, b):
-    return Point(FieldElement(x, p),
-                FieldElement(y, p),
-                FieldElement(a, p),
-                FieldElement(b, p),)
+    try:
+        return Point(FieldElement(x, p),
+                    FieldElement(y, p),
+                    FieldElement(a, p),
+                    FieldElement(b, p),)
+    except:
+        raise PreventUpdate
 
 
 order_dict = {} # cache results
@@ -491,5 +499,48 @@ def decrypt(key, message):
 
     return decrypted_msg
 
+
+def get_triggered():
+    """retrieve id of the triggered element"""
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        button_id = 'No clicks yet'
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    return button_id
+
+def update_message(key, encrypt_click, decrypt_click, send_click, receive_message, current_message):
+    """update the text box"""
+    button_id = get_triggered()
+    error_msg = ''
+
+    if 'encrypt' in button_id:
+        if key == '':
+            error_msg = 'cannot encrypt without key!'
+            return current_message, error_msg
+        encrypted_msg = encrypt(key, current_message)
+        return encrypted_msg, error_msg
+    if 'decrypt' in button_id:
+        if key == '':
+            error_msg = 'cannot decrypt without key!'
+            return current_message, error_msg
+        try:
+            decrypted_msg = decrypt(key, current_message)
+            return decrypted_msg, error_msg
+        except InvalidToken:
+            return current_message, 'Cannot decrypt with {}!'.format(key.strip('**'))
+
+    if 'send' in button_id:
+        received_msg = receive_message
+        return received_msg, "You've got mail!"
+
+    return None, error_msg
+
+def update_crypto_buttons(key):
+    if key == '':
+        return 'secondary', 'secondary'
+    else:
+        return 'primary', 'primary'
 
 
