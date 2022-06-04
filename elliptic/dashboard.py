@@ -449,6 +449,11 @@ def subgroup_order(P):
 
 
 
+def get_fernet(key_str):
+    fernet_key = base64.urlsafe_b64encode(bytes(key_str.ljust(32).encode()))
+    return Fernet(fernet_key)
+
+
 def encrypt(key, message):
     # Fernet(base64.urlsafe_b64encode(b'(3,4)'.ljust(32)))
     if message is None:
@@ -460,12 +465,31 @@ def encrypt(key, message):
     key_str = str(key)
     logging.debug('key str:{}'.format(key_str))
 
-    fernet_key = base64.urlsafe_b64encode(bytes(key_str.ljust(32).encode()))
-    f = Fernet(fernet_key)
+    f = get_fernet(key_str)
     token = f.encrypt(message.encode())
 
-    encrypted_msg = str(token)
+    encrypted_msg = token.decode('ascii')
 
     return encrypted_msg
+
+
+def send(n_clicks, message):
+    if n_clicks == 0:
+        raise PreventUpdate
+
+    return message
+
+def decrypt(key, message):
+    if message is None:
+        raise PreventUpdate
+
+    if key == '':
+        raise PreventUpdate
+
+    f = get_fernet(str(key))
+    decrypted_msg = f.decrypt(message.encode()).decode('ascii')
+
+    return decrypted_msg
+
 
 

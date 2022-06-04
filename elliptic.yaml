@@ -320,6 +320,21 @@ layout:
                                       id: alice-send
                                       children: Send
                                       color: primary
+                              - html.Div:
+                                  id: decrypt-alice-outer
+                                  children:
+                                  - html.Br:
+                                  - dbc.Textarea:
+                                      id: alice-decrypt
+                                      value:
+                                      placeholder: Receive encrypted message here
+                                      style:
+                                        height: 135
+                                  - dbc.Input:
+                                      id: alice-decrypted
+                                      placeholder: Decrypted message here
+                                      type: text
+                                      value:
 
 
                           - dbc.Col:
@@ -369,10 +384,14 @@ layout:
                                   - dbc.Textarea:
                                       id: bob-decrypt
                                       value:
-                                      placeholder: Decrypt message here
+                                      placeholder: Receive encrypted message here
                                       style:
                                         height: 135
-                              
+                                  - dbc.Input:
+                                      id: bob-decrypted
+                                      placeholder: Decrypted message here
+                                      type: text
+                                      value:
 
 callbacks:
   add_graph:
@@ -702,6 +721,15 @@ callbacks:
         attr: style
     callback: elliptic.dashboard.show_hide_decrypt
 
+  show_hide_alice_decrypt:
+    input:
+      - id: alice-sharing-mode
+        attr: value
+    output:
+      - id:  decrypt-alice-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_decrypt
+
   update_bob_pub:
     input:
       - id: user-input-p
@@ -792,6 +820,17 @@ callbacks:
         attr: value
     callback: elliptic.dashboard.encrypt
 
+  alice_send:
+    input:
+      - id: alice-send
+        attr: n_clicks
+    state:
+      - id: alice-encrypted
+        attr: value
+    output:
+      - id: bob-decrypt
+        attr: value
+    callback: elliptic.dashboard.send
 
   encrypt_bob_message:
     input:
@@ -804,4 +843,50 @@ callbacks:
         attr: value
     callback: elliptic.dashboard.encrypt
 
+  bob_send:
+    input:
+      - id: bob-send
+        attr: n_clicks
+    state:
+      - id: bob-encrypted
+        attr: value
+    output:
+      - id: alice-decrypt
+        attr: value
+    callback: elliptic.dashboard.send
+
+
+  encrypt_bob_message:
+    input:
+      - id: bob-shared-secret
+        attr: children
+      - id: bob-message
+        attr: value
+    output:
+      - id: bob-encrypted
+        attr: value
+    callback: elliptic.dashboard.encrypt
+
+
+  bob_decrypt:
+    input:
+      - id: bob-shared-secret
+        attr: children
+      - id: bob-decrypt
+        attr: value
+    output:
+      - id: bob-decrypted
+        attr: value
+    callback: elliptic.dashboard.decrypt
+
+  alice_decrypt:
+    input:
+      - id: alice-shared-secret
+        attr: children
+      - id: alice-decrypt
+        attr: value
+    output:
+      - id: alice-decrypted
+        attr: value
+    callback: elliptic.dashboard.decrypt
 
