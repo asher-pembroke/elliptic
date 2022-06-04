@@ -120,16 +120,9 @@ def show_hide_secret(mode):
     else:
         return dict(display='none')
 
-def show_hide_encrypt(mode):
+def show_hide_message(mode):
     # show the secret key 
     if mode == 3:
-        return dict(display='block')
-    else:
-        return dict(display='none')
-
-def show_hide_decrypt(mode):
-    # show the secret key 
-    if mode == 4:
         return dict(display='block')
     else:
         return dict(display='none')
@@ -517,13 +510,13 @@ def update_message(key, encrypt_click, decrypt_click, send_click, receive_messag
 
     if 'encrypt' in button_id:
         if key == '':
-            error_msg = 'cannot encrypt without key!'
+            error_msg = 'cannot encrypt without shared secret!'
             return current_message, error_msg
         encrypted_msg = encrypt(key, current_message)
         return encrypted_msg, error_msg
     if 'decrypt' in button_id:
         if key == '':
-            error_msg = 'cannot decrypt without key!'
+            error_msg = 'cannot decrypt without shared secret!'
             return current_message, error_msg
         try:
             decrypted_msg = decrypt(key, current_message)

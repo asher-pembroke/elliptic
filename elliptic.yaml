@@ -103,7 +103,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: secret-sharing
+        active_tab: signatures
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -392,9 +392,279 @@ layout:
                                                     id: bob-send
                                                     children: Send
                                                     color: success
+        - dbc.Tab:
+            tab_id: signatures
+            label: Signatures
+            children:
+            - dcc.Store:
+                id: sign-pub
+            - dcc.Store:
+                id: sign-k-points
+            - dcc.Store:
+                id: validate-points
+            - dbc.Card:
+                children:
+                - dbc.CardBody:
+                    children:
+                    - dbc.Row:
+                        children:
+                        - dbc.Col:
+                            width: 6
+                            children:
+                            - dbc.Row:
+                                children:
+                                - dbc.Col:
+                                    width: 12
+                                    children:
+                                    - dbc.RadioItems:
+                                        id: sign-sharing-mode
+                                        options:
+                                        - label: Pub Key
+                                          value: 1
+                                        - label: k secret
+                                          value: 2
+                                        - label: Message
+                                          value: 3
+                                        value: 1
+                                        inline: True
+                            - dbc.Row:
+                                children:
+                                - dbc.Col:
+                                    width: 2
+                                    children:
+                                    - dbc.Label: Priv key
+                                    - dbc.Input:
+                                        id: sign-priv
+                                        type: number
+                                        value: 7
+                                        min: 1
+                                - dbc.Col:
+                                    width: 3
+                                    children:
+                                    - dbc.Label: Pub key
+                                    - dcc.Markdown:
+                                        id: sign-pub-key
+                                        children: ''
+                                - dbc.Col:
+                                    width: 2
+                                    children:
+                                    - dbc.Label: Rand k
+                                    - dbc.Input:
+                                        id: sign-k
+                                        type: number
+                                        value: 10
+                                        min: 1
+                                - dbc.Col:
+                                    width: 3
+                                    children:
+                                    - dbc.Label: P_k
+                                    - dcc.Markdown:
+                                        id: sign-k-key
+                                        children: ''
+                            - html.Div:
+                                id: pub-graph-sign-outer
+                                children:
+                                - dcc.Graph:
+                                    id: pub-graph-sign
+                                    mathjax: True
+                                    config:
+                                      displayModeBar: False
+                                    figure: ${empty_graph}
+                            - html.Div:
+                                id: k-graph-sign-outer
+                                children:
+                                - dcc.Graph:
+                                    id: k-graph-sign
+                                    mathjax: True
+                                    config:
+                                      displayModeBar: False
+                                    figure: ${empty_graph}
+                            - html.Div:
+                                id: sign-message-outer
+                                children:
+                                - dbc.Col:
+                                    width: 6
+                                    children:
+                                    - dbc.Textarea:
+                                        id: sign-message
+                                        value:
+                                        placeholder: Enter message to sign
+                                        style:
+                                          height: 80
+                        - dbc.Col:
+                            width: 6
+                            children:
+                              dcc.Graph:
+                                id: validate-graph
+                                mathjax: True
+                                config:
+                                  displayModeBar: False
+                                figure: ${empty_graph}
 
 
 callbacks:
+  # update_validate_points:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: validate-graph
+  #       attr: clickData
+  #   state:
+  #     - id: validate-points
+  #       attr: data
+  #   output:
+  #     - id: validate-points
+  #       attr: data
+  #   callback: elliptic.dashboard.update_add_points
+
+  show_hide_sign_pub:
+    input:
+      - id: sign-sharing-mode
+        attr: value
+    output:
+      - id:  pub-graph-sign-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_pub
+
+  show_hide_sign_k:
+    input:
+      - id: sign-sharing-mode
+        attr: value
+    output:
+      - id:  k-graph-sign-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_secret
+
+
+  update_sign_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-priv
+        attr: value
+      - id: pub-graph-sign
+        attr: clickData
+    state:
+      - id: sign-pub
+        attr: data
+    output:
+      - id: sign-pub
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  # update_sign_k:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: sign-priv
+  #       attr: value
+  #     - id: k-graph-sign
+  #       attr: clickData
+  #   state:
+  #     - id: sign-k-points
+  #       attr: data
+  #   output:
+  #     - id: sign-k-points
+  #       attr: data
+  #   callback: elliptic.dashboard.update_multiply_points
+
+
+  pub_graph_sign:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-priv
+        attr: value
+      - id: sign-pub
+        attr: data
+    output:
+      - id: pub-graph-sign
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
+
+  # k_graph_sign:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: sign-priv
+  #       attr: value
+  #     - id: sign-k-points
+  #       attr: data
+  #   output:
+  #     - id: k-graph-sign
+  #       attr: figure
+  #   callback: elliptic.dashboard.multiply_graph
+
+
+  render_sign_pub:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-pub
+        attr: data
+    output:
+      - id: sign-pub-key
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+
+  # render_sign_k:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: sign-k-points
+  #       attr: data
+  #   output:
+  #     - id: sign-k-key
+  #       attr: children
+  #   callback: elliptic.dashboard.render_pub_key
+
+
+  update_validate_graph:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: validate-points
+        attr: data
+    output:
+      - id: validate-graph
+        attr: figure
+    callback: elliptic.dashboard.add_graph
+
+
+
   add_graph:
     input:
       - id: user-input-p
@@ -676,14 +946,14 @@ callbacks:
     callback: elliptic.dashboard.show_hide_secret
 
 
-  show_hide_alice_encrypt:
+  show_hide_alice_message:
     input:
       - id: alice-sharing-mode
         attr: value
     output:
       - id:  encrypt-alice-outer
         attr: style
-    callback: elliptic.dashboard.show_hide_encrypt
+    callback: elliptic.dashboard.show_hide_message
 
 
   show_hide_bob_pub:
@@ -704,14 +974,14 @@ callbacks:
         attr: style
     callback: elliptic.dashboard.show_hide_secret
 
-  show_hide_bob_encrypt:
+  show_hide_bob_message:
     input:
       - id: bob-sharing-mode
         attr: value
     output:
       - id:  encrypt-bob-outer
         attr: style
-    callback: elliptic.dashboard.show_hide_encrypt
+    callback: elliptic.dashboard.show_hide_message
 
   update_bob_pub:
     input:
