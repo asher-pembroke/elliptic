@@ -84,6 +84,51 @@ empty_graph:
       showgrid: False
       zeroline: False
 
+
+
+references_secp256: "### References
+
+* Point implmentation from Jimmy Song's [Programming Bitcoin](https://github.com/jimmysong/programmingbitcoin)
+
+* Bitcoin uses [secp256k1](https://en.bitcoin.it/wiki/Secp256k1)
+
+"
+
+
+title: "
+## Finite Elliptic Curves
+
+### BTC++  June 7, 2022 - Austin TX
+ 
+An interactive primer on finite elliptic curves.
+"
+
+subtitle: "
+#### Asher Pembroke
+
+BTC++
+
+June 7, 2022 Austin TX
+
+"
+
+references: "# References
+
+Further reading:
+
+* Bitcon's [ECDSA](https://en.bitcoin.it/wiki/Elliptic_Curve_Digital_Signature_Algorithm) (can be used with other algorithms such as Schnorr)
+
+* [An illustrated guide to elliptic curve cryptography validation](https://research.nccgroup.com/2021/11/18/an-illustrated-guide-to-elliptic-curve-cryptography-validation/)
+
+* Andrea Corbellini - [Elliptic Curve Cryptography - A gentle introduction](https://andrea.corbellini.name/2015/05/17/elliptic-curve-cryptography-a-gentle-introduction/)
+
+* [Bolt 04 secret sharing](https://github.com/lightning/bolts/blob/master/04-onion-routing.md)
+
+* [PGP](https://en.wikipedia.org/wiki/Pretty_Good_Privacy) [with elliptic curves](https://ieeexplore.ieee.org/abstract/document/7813870)
+
+* [support for secp256 in GPG](https://github.com/openpgpjs/openpgpjs/pull/628)
+"
+
 layout:
   dbc.Container:
     children:
@@ -92,8 +137,12 @@ layout:
         - dbc.Col:
             width: 8
             children:
-            - html.H1: Finite Elliptic Curves
-            - html.Div: BTC++ 2022, Austin TX
+            - dcc.Markdown: ${title}
+        - dbc.Col:
+            width: 4
+            children:
+            - html.Br:
+            - dcc.Markdown: ${subtitle}
     - dbc.Row:
         children:
         - dbc.Col:
@@ -103,7 +152,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: signatures
+        active_tab: point-addition
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -111,16 +160,27 @@ layout:
             children:
             - dcc.Store:
                 id: add-points
-            - dbc.Card:
+            - dbc.Row:
                 children:
-                - dbc.CardBody:
-                    children:
-                    - dcc.Graph:
-                        id: add-graph
-                        mathjax: True
-                        config:
-                          displayModeBar: False
-                        figure: ${empty_graph}
+                  - dbc.Col:
+                      children:
+                        - dbc.Card:
+                            children:
+                            - dbc.CardBody:
+                                children:
+                                - dcc.Graph:
+                                    id: add-graph
+                                    mathjax: True
+                                    config:
+                                      displayModeBar: False
+                                    figure: ${empty_graph}
+                  - dbc.Col:
+                      children:
+                      - html.Br:
+                      - html.Br:
+                      - dcc.Markdown:
+                          children: ${references_secp256}
+                          mathjax: True
         - dbc.Tab:
             tab_id: point-multiplication
             label: Point Multiplication
@@ -143,9 +203,10 @@ layout:
                                 value: 0
                                 min: 0
                         - dbc.Col:
-                            width: 3
+                            width: 2
                             children:
                             - dbc.RadioItems:
+                                id: multiply-mode
                                 options:
                                 - label: 'Multiply'
                                   value: 1
@@ -153,7 +214,11 @@ layout:
                                   value: 2
                                 value: 1
                                 inline: True
+                        - dbc.Col:
+                            width: 2
+                            children:
                             - dbc.Checklist:
+                                id: multiply-subgroup
                                 options:
                                 - label: 'show subgroup'
                                   value: 1
@@ -183,26 +248,27 @@ layout:
                 - dbc.CardBody:
                     children:
                     - dbc.Row:
+                        justify: left
                         children:
                         - dbc.Col:
                             width: 6
                             children:
-                            - dbc.Row:
-                                children:
-                                - dbc.Col:
-                                    width: 12
-                                    children:
-                                    - dbc.RadioItems:
-                                        id: alice-sharing-mode
-                                        options:
-                                        - label: 'Pub Key'
-                                          value: 1
-                                        - label: 'Shared Secret'
-                                          value: 2
-                                        - label: 'Message'
-                                          value: 3
-                                        value: 1
-                                        inline: True
+                            - dbc.RadioItems:
+                                id: sharing-mode
+                                options:
+                                - label: 'Pub Key'
+                                  value: 1
+                                - label: 'Shared Secret'
+                                  value: 2
+                                - label: 'Message'
+                                  value: 3
+                                value: 1
+                                inline: True
+                    - dbc.Row:
+                        children:
+                        - dbc.Col:
+                            width: 6
+                            children:
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
@@ -232,22 +298,6 @@ layout:
                         - dbc.Col:
                             width: 6
                             children:
-                            - dbc.Row:
-                                children:
-                                - dbc.Col:
-                                    width: 12
-                                    children:
-                                    - dbc.RadioItems:
-                                        id: bob-sharing-mode
-                                        options:
-                                        - label: 'Pub Key'
-                                          value: 1
-                                        - label: 'Shared Secret'
-                                          value: 2
-                                        - label: 'Message'
-                                          value: 3
-                                        value: 1
-                                        inline: True
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
@@ -399,7 +449,7 @@ layout:
             - dcc.Store:
                 id: sign-pub
             - dcc.Store:
-                id: sign-k-points
+                id: sign-secret
             - dcc.Store:
                 id: validate-points
             - dbc.Card:
@@ -448,7 +498,7 @@ layout:
                                 - dbc.Col:
                                     width: 2
                                     children:
-                                    - dbc.Label: Rand k
+                                    - dbc.Label: k
                                     - dbc.Input:
                                         id: sign-k
                                         type: number
@@ -459,7 +509,7 @@ layout:
                                     children:
                                     - dbc.Label: P_k
                                     - dcc.Markdown:
-                                        id: sign-k-key
+                                        id: sign-p-k
                                         children: ''
                             - html.Div:
                                 id: pub-graph-sign-outer
@@ -474,7 +524,7 @@ layout:
                                 id: k-graph-sign-outer
                                 children:
                                 - dcc.Graph:
-                                    id: k-graph-sign
+                                    id: secret-graph-sign
                                     mathjax: True
                                     config:
                                       displayModeBar: False
@@ -482,15 +532,15 @@ layout:
                             - html.Div:
                                 id: sign-message-outer
                                 children:
-                                - dbc.Col:
-                                    width: 6
-                                    children:
-                                    - dbc.Textarea:
-                                        id: sign-message
-                                        value:
-                                        placeholder: Enter message to sign
-                                        style:
-                                          height: 80
+                                - html.Br:
+                                - dbc.Textarea:
+                                    id: sign-message
+                                    value:
+                                    placeholder: Enter message to sign
+                                    style:
+                                      height: 80
+                                - dcc.Markdown:
+                                    id: sign-params
                         - dbc.Col:
                             width: 6
                             children:
@@ -500,7 +550,12 @@ layout:
                                 config:
                                   displayModeBar: False
                                 figure: ${empty_graph}
-
+        - dbc.Tab:
+            tab_id: references
+            label: References
+            children:
+              - dcc.Markdown:
+                  children: ${references}
 
 callbacks:
   # update_validate_points:
@@ -539,6 +594,27 @@ callbacks:
         attr: style
     callback: elliptic.dashboard.show_hide_secret
 
+  update_sign_priv_bounds:
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: pub-graph-sign
+      attr: clickData
+    state:
+    - id: sign-priv
+      attr: value
+    output:
+    - id: sign-priv
+      attr: max
+    - id: sign-priv
+      attr: value
+    callback: elliptic.dashboard.priv_in_bounds
+
+
 
   update_sign_pub:
     input:
@@ -560,25 +636,46 @@ callbacks:
         attr: data
     callback: elliptic.dashboard.update_multiply_points
 
-  # update_sign_k:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: sign-priv
-  #       attr: value
-  #     - id: k-graph-sign
-  #       attr: clickData
-  #   state:
-  #     - id: sign-k-points
-  #       attr: data
-  #   output:
-  #     - id: sign-k-points
-  #       attr: data
-  #   callback: elliptic.dashboard.update_multiply_points
+  update_sign_secret_bounds:
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: secret-graph-sign
+      attr: clickData
+    state:
+    - id: sign-k
+      attr: value
+    output:
+    - id: sign-k
+      attr: max
+    - id: sign-k
+      attr: value
+    callback: elliptic.dashboard.priv_in_bounds
+
+
+  update_sign_secret:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-k
+        attr: value
+      - id: secret-graph-sign
+        attr: clickData
+    state:
+      - id: sign-secret
+        attr: data
+    output:
+      - id: sign-secret
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
 
 
   pub_graph_sign:
@@ -598,22 +695,22 @@ callbacks:
         attr: figure
     callback: elliptic.dashboard.multiply_graph
 
-  # k_graph_sign:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: sign-priv
-  #       attr: value
-  #     - id: sign-k-points
-  #       attr: data
-  #   output:
-  #     - id: k-graph-sign
-  #       attr: figure
-  #   callback: elliptic.dashboard.multiply_graph
+  secret_graph_sign:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-k
+        attr: value
+      - id: sign-secret
+        attr: data
+    output:
+      - id: secret-graph-sign
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
 
 
   render_sign_pub:
@@ -632,20 +729,36 @@ callbacks:
     callback: elliptic.dashboard.render_pub_key
 
 
-  # render_sign_k:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: sign-k-points
-  #       attr: data
-  #   output:
-  #     - id: sign-k-key
-  #       attr: children
-  #   callback: elliptic.dashboard.render_pub_key
+  render_sign_secret:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-secret
+        attr: data
+    output:
+      - id: sign-p-k
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+
+  render_sign_params:
+    input:
+      - id: sign-priv
+        attr: value
+      - id: sign-k
+        attr: value
+      - id: sign-message
+        attr: value
+      - id: sign-p-k
+        attr: children
+    output:
+      - id: sign-params
+        attr: children
+    callback: elliptic.dashboard.render_sign_params
 
 
   update_validate_graph:
@@ -693,10 +806,14 @@ callbacks:
         attr: value
       - id: multiply-points
         attr: data
+      - id: multiply-mode
+        attr: value
+      - id: multiply-subgroup
+        attr: value
     output:
       - id: multiply-graph
         attr: figure
-    callback: elliptic.dashboard.multiply_graph
+    callback: elliptic.dashboard.multiply_inverse_graph
 
   update_slider_label:
     input:
@@ -882,7 +999,7 @@ callbacks:
         attr: value
       - id: alice-pub
         attr: data
-      - id: alice-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id: pub-graph-alice
@@ -901,7 +1018,7 @@ callbacks:
         attr: value
       - id: alice-secret
         attr: data
-      - id: alice-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id: secret-graph-alice
@@ -920,7 +1037,7 @@ callbacks:
         attr: value
       - id: bob-secret
         attr: data
-      - id: bob-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id: secret-graph-bob
@@ -929,7 +1046,7 @@ callbacks:
 
   show_hide_alice_pub:
     input:
-      - id: alice-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  pub-graph-alice-outer
@@ -938,7 +1055,7 @@ callbacks:
 
   show_hide_alice_secret:
     input:
-      - id: alice-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  secret-graph-alice-outer
@@ -948,7 +1065,7 @@ callbacks:
 
   show_hide_alice_message:
     input:
-      - id: alice-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  encrypt-alice-outer
@@ -958,7 +1075,7 @@ callbacks:
 
   show_hide_bob_pub:
     input:
-      - id: bob-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  pub-graph-bob-outer
@@ -967,7 +1084,7 @@ callbacks:
 
   show_hide_bob_secret:
     input:
-      - id: bob-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  secret-graph-bob-outer
@@ -976,7 +1093,7 @@ callbacks:
 
   show_hide_bob_message:
     input:
-      - id: bob-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id:  encrypt-bob-outer
@@ -1016,14 +1133,14 @@ callbacks:
         attr: value
       - id: bob-pub
         attr: data
-      - id: bob-sharing-mode
+      - id: sharing-mode
         attr: value
     output:
       - id: pub-graph-bob
         attr: figure
     callback: elliptic.dashboard.multiply_graph
 
-  update_multiply_points:
+  update_multiply_inverse_points:
     input:
       - id: user-input-p
         attr: value
@@ -1035,13 +1152,15 @@ callbacks:
         attr: value
       - id: multiply-graph
         attr: clickData
+      - id: multiply-mode
+        attr: value
     state:
       - id: multiply-points
         attr: data
     output:
       - id: multiply-points
         attr: data
-    callback: elliptic.dashboard.update_multiply_points
+    callback: elliptic.dashboard.update_multiply_inverse_points
 
   update_add_points:
     input:

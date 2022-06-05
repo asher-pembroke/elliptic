@@ -130,6 +130,9 @@ def show_hide_message(mode):
 
 def multiply_graph(p_i, a, b, n, points, *args):
     """multiply points by n"""
+    if n is None:
+        raise PreventUpdate
+
     ctx = dash.callback_context
 
     if len(args) > 0:
@@ -235,6 +238,122 @@ def multiply_graph(p_i, a, b, n, points, *args):
 
     return fig
 
+def modinv(a, b):
+    """from Jimmy Song"""
+    return pow(a, b - 2, b) 
+
+def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
+    """multiply points by n"""
+    if n is None:
+        raise PreventUpdate
+        
+    ctx = dash.callback_context
+
+    active_tab = 'point-multiplication'
+
+    p = primes_[p_i]
+
+    curve = elliptic(p, a, b)
+
+    fig = go.Figure(
+            data=go.Heatmap(z=curve,
+                showscale=False,
+                colorscale='gray',
+                hoverinfo = 'text',
+                text = array_to_str(curve),
+                ),
+            )
+
+    title_str = ''
+
+    title_str += get_eqn_str(p, a, b)
+
+    order_ = order(p, a, b)
+
+    title_str += f"\quad N:{order_}"
+
+    if points is not None:
+        curve_key = str((p,a,b,mode))
+        if curve_key in points:
+            pts = points[curve_key]
+            if len(pts) > 0:
+                x_0, y_0 = pts[0]
+                G_0 = point_in_curve(x_0, y_0, p, a, b)
+                subgroup_order_ = subgroup_order(G_0)
+                base_point = go.Scatter(x=[x_0], y=[y_0],
+                    text=[],
+                    marker_symbol='square',
+                    marker=dict(size=get_p_size(p_i)),
+                    hoverinfo='skip',
+                    mode='markers',
+                    showlegend=False,)
+                fig.add_trace(base_point)
+
+                if mode == 1:
+                    title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
+                elif mode == 2:
+                    title_str += '\qquad {}^'.format(str(n))
+                    title_str += '{-1}'
+                    title_str += '\cdot {}'.format(str((x_0, y_0)))
+
+                if n == 0:
+                    title_str += ' = \infty'
+
+                if show_subgroup:
+                    x_ = []
+                    y_ = []
+                    for i in range(subgroup_order_):
+                        P_i = i*G_0
+                        if P_i.x is not None:
+                            x_.append(P_i.x.num)
+                            y_.append(P_i.y.num)
+                    subgroup = go.Scatter(x=x_, y=y_,
+                        text = [],
+                        marker_symbol='square',
+                        marker=dict(size=get_p_size(p_i)),
+                        hoverinfo='skip',
+                        mode='markers',
+                        showlegend=False,
+                        )
+                    fig.add_trace(subgroup)
+
+            if len(pts) == 2: # get second point
+                x_n, y_n = pts[1]
+                n_point = go.Scatter(x=[x_n], y=[y_n],
+                    text=[],
+                    marker_symbol='square',
+                    marker=dict(size=get_p_size(p_i)),
+                    hoverinfo='skip',
+                    mode='markers',
+                    showlegend=False)
+                fig.add_trace(n_point)
+
+                if n == 0:
+                    pass
+                elif x_n == -1:
+                    title_str += ' = \infty'
+                else:
+                    title_str += ' = {}'.format(str((x_n, y_n)))
+
+            if len(pts) > 0:
+                title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
+
+            for p_ in pts:
+                x_, y_ = p_
+                fig.add_annotation(**get_pnt_annotation(x_, y_, str((x_, y_))))
+
+    fig.update_layout(dict(
+                xaxis=dict(range=[0,p-1]),
+                yaxis=dict(range=[0,p-1]),
+                title="$ {} $".format(title_str)))
+
+    if active_tab == 'secret-sharing':
+        fig.update_layout(width=600, height=600)
+    else:
+        fig.update_layout(width=700, height=700)
+
+    return fig
+
 def priv_in_bounds(p_i, a, b, clickData, current_priv):
     """set bounds of the private key"""
     p = primes_[p_i]
@@ -322,8 +441,57 @@ def add_graph(p_i, a, b, points):
                 title="$ {} $".format(title_str)))
     return fig
 
-def update_multiply_points(p_i, a, b, n, clickData, store):
+def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
+    if n is None:
+        raise PreventUpdate
+
     p = primes_[p_i]
+
+    print(mode)
+    logging.debug('mode :{}'.format(mode))
+
+    curve_key = str((p, a, b, mode))
+    
+    if store is not None:
+        if curve_key in store:
+            points = [tuple(v) for v in store[curve_key]]
+        else:
+            points = []
+    else:
+        points = []
+        store = {curve_key: points}
+
+    if clickData is not None:
+        # replace the first point
+        p_0 = clickData['points'][0]
+        x_0, y_0 = p_0['x'], p_0['y']
+        try:
+            G_0 = point_in_curve(x_0, y_0, p, a, b)
+            points = [(x_0, y_0)]
+        except ValueError:
+            raise PreventUpdate
+
+        if mode == 2:
+            subgroup_order_ = subgroup_order(G_0)
+            print('subgroup order of G_0 {}'.format(subgroup_order_))
+            p_n = modinv(n, p)*G_0
+        else:
+            print('no inverse, mode = {}'.format(mode))
+            p_n = n*G_0
+        if p_n.x is not None:
+            points.append((p_n.x.num, p_n.y.num))
+        else:
+            points.append((-1, -1))
+        
+    store[curve_key] = points
+    return store
+
+def update_multiply_points(p_i, a, b, n, clickData, store):
+    if n is None:
+        raise PreventUpdate
+
+    p = primes_[p_i]
+
     curve_key = str((p, a, b))
 
     if store is not None:
@@ -344,6 +512,7 @@ def update_multiply_points(p_i, a, b, n, clickData, store):
             points = [(x_0, y_0)]
         except ValueError:
             raise PreventUpdate
+
         p_n = n*G_0
         if p_n.x is not None:
             points.append((p_n.x.num, p_n.y.num))
@@ -535,5 +704,16 @@ def update_crypto_buttons(key):
         return 'secondary', 'secondary'
     else:
         return 'primary', 'primary'
+
+
+def render_sign_params(priv_key, k, message, p):
+    if message is None:
+        message = ''
+    p = p.strip('**')
+
+
+    return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
+
+
 
 
