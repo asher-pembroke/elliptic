@@ -158,7 +158,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: point-addition
+        active_tab: signatures
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -216,8 +216,8 @@ layout:
                                 options:
                                 - label: 'Multiply'
                                   value: 1
-                                - label: 'Inverse'
-                                  value: 2
+                                # - label: 'Inverse'
+                                #   value: 2
                                 value: 1
                                 inline: True
                         - dbc.Col:
@@ -547,6 +547,7 @@ layout:
                                       height: 80
                                 - dcc.Markdown:
                                     id: sign-params
+                                    mathjax: True
                         - dbc.Col:
                             width: 6
                             children:
@@ -560,8 +561,8 @@ layout:
             tab_id: references
             label: References
             children:
-              - dcc.Markdown:
-                  children: ${references}
+            - dcc.Markdown:
+                children: ${references}
 
 callbacks:
   # update_validate_points:
@@ -599,6 +600,15 @@ callbacks:
       - id:  k-graph-sign-outer
         attr: style
     callback: elliptic.dashboard.show_hide_secret
+
+  show_hide_alice_message:
+    input:
+      - id: sign-sharing-mode
+        attr: value
+    output:
+      - id:  sign-message-outer
+        attr: style
+    callback: elliptic.dashboard.show_hide_message
 
   update_sign_priv_bounds:
     input:
@@ -750,19 +760,25 @@ callbacks:
         attr: children
     callback: elliptic.dashboard.render_pub_key
 
-
+# p_i, a, b, priv_key, k, pub_points, secret_points, message
   render_sign_params:
     input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
       - id: sign-priv
         attr: value
       - id: sign-k
         attr: value
-      - id: sign-message
-        attr: value
-      - id: sign-p-k
-        attr: children
+      - id: sign-pub
+        attr: data
       - id: sign-secret
         attr: data
+      - id: sign-message
+        attr: value
     output:
       - id: sign-params
         attr: children

@@ -10,6 +10,7 @@ from cryptography.fernet import Fernet, InvalidToken
 import base64
 import json
 
+from cryptography.hazmat.primitives import hashes
 
 
 logging.basicConfig(filename='elliptic.log',
@@ -238,9 +239,24 @@ def multiply_graph(p_i, a, b, n, points, *args):
 
     return fig
 
-def modinv(a, b):
-    """from Jimmy Song"""
-    return pow(a, b - 2, b) 
+def extended_gcd(aa, bb):
+    # from https://rosettacode.org/wiki/Modular_inverse#Python
+    lastremainder, remainder = abs(aa), abs(bb)
+    x, lastx, y, lasty = 0, 1, 1, 0
+    while remainder:
+        lastremainder, (quotient, remainder) = remainder, divmod(lastremainder, remainder)
+        x, lastx = lastx - quotient*x, x
+        y, lasty = lasty - quotient*y, y
+    return lastremainder, lastx * (-1 if aa < 0 else 1), lasty * (-1 if bb < 0 else 1)
+ 
+def modinv(a, m):
+    # from https://rosettacode.org/wiki/Modular_inverse#Python
+    if m not in primes_:
+        raise ValueError('{} not in first 100 primes!'.format(m))
+    g, x, y = extended_gcd(a, m)
+    if g != 1:
+        raise ValueError
+    return x % m
 
 def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     """multiply points by n"""
@@ -460,6 +476,7 @@ def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
     else:
         points = []
         store = {curve_key: points}
+
 
     if clickData is not None:
         # replace the first point
@@ -705,16 +722,90 @@ def update_crypto_buttons(key):
     else:
         return 'primary', 'primary'
 
+def sha256(message):
+    digest = hashes.Hash(hashes.SHA256())
+    digest.update(message.encode())
+    digest.update(b"123")
+    return digest.finalize()
 
-def render_sign_params(priv_key, k, message, p, secret_points):
+def get_z(message, size_):
+    z = int.from_bytes(sha256(message)[:size_], "big")
+    return z
+
+def get_s(k, z, r, d_a, n):
+    k_inv = modinv(k, n)
+    return (k_inv*((z%n + (r*d_a)%n)%n))%n
+
+def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, message):
+    p = primes_[p_i]
+
+    curve_key = str((p,a,b))
+
+    if curve_key not in pub_points:
+        return "Must supply private key"
+    if curve_key not in secret_points:
+        return "Must choose secret key k"
+
+    pub_points = pub_points[curve_key]
+    secret_points = secret_points[curve_key]
+
+    if len(pub_points) == 0:
+        return "Must choose public key"
+
+    if len(secret_points) == 0:
+        return "Must choose secret key"
+
+
+    G_0 = tuple(pub_points[0])
+    K_0 = tuple(secret_points[0])
+
+    if G_0 != K_0:
+        return "Generator point for ${}$ does not match Secret Key ${}$, please try again.".format(G_0, K_0)
+
+    x_0, y_0 = secret_points[0]
+    subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
+
+    try:
+        r = modinv(secret_points[-1][0], subgroup_order_)
+    except:
+        return 'could not compute prime inverse for {}'.format(subgroup_order_)
+
+    if r == 0:
+        return "$P_{kx}$ = 0! please choose another (random) k!"
+
+    if message is None:
+        return "Message required to proceed."
+
+    z_size = 2
+    n = int.from_bytes((subgroup_order_).to_bytes(2, 'big'),'big')
+    z = get_z(message, z_size)
+
+    try:
+        return f'modinv({k},{n})={modinv(k,n)}'
+    except:
+        return f'cannot compute modinv({k},{n})'
+
+    s = get_s(k, z, r, priv_key, n)
+
+    message_ = "r: {}\n\n".format(r)
+    message_ += "s = k^{-1}(z+r(priv_key)) = "
+    message_ += f"({k})^(-1)({z}+{r}({priv_key})) mod {n} = "
+    message_ += str(s)
+
+    message_ += f'\n\n Signature: ({r}, {s})'
+
+    return message_
+
     if message is None:
         message = ''
-    if p != '':
-        p = tuple([int(_) for _ in p.strip('**').strip('(').strip(')').split(',')])
 
-    return str(secret_points)
+    return_msg = "pub_points: {}".format(str(pub_points))
+    return_msg += "secret_points: {}".format(str(secret_points))
+    return return_msg
+
+    # return str(secret_points)
     # subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
-
+    return_msg = message.format(pub_key)
     return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
 
 
