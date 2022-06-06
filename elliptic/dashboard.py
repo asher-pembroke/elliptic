@@ -246,7 +246,7 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     """multiply points by n"""
     if n is None:
         raise PreventUpdate
-        
+
     ctx = dash.callback_context
 
     active_tab = 'point-multiplication'
@@ -706,11 +706,14 @@ def update_crypto_buttons(key):
         return 'primary', 'primary'
 
 
-def render_sign_params(priv_key, k, message, p):
+def render_sign_params(priv_key, k, message, p, secret_points):
     if message is None:
         message = ''
-    p = p.strip('**')
+    if p != '':
+        p = tuple([int(_) for _ in p.strip('**').strip('(').strip(')').split(',')])
 
+    return str(secret_points)
+    # subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
 
     return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
 

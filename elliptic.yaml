@@ -88,9 +88,15 @@ empty_graph:
 
 references_secp256: "### References
 
-* Point implmentation from Jimmy Song's [Programming Bitcoin](https://github.com/jimmysong/programmingbitcoin)
+* Point implementation from Jimmy Song's [Programming Bitcoin](https://github.com/jimmysong/programmingbitcoin)
 
 * Bitcoin uses [secp256k1](https://en.bitcoin.it/wiki/Secp256k1)
+
+In bitcoin, p is:
+
+$2^{256} - 2^{32} - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1 = 1.15*10^{77}$
+
+or .0012 x number of atoms in the known universe!
 
 "
 
@@ -100,7 +106,7 @@ title: "
 
 ### BTC++  June 7, 2022 - Austin TX
  
-An interactive primer on finite elliptic curves.
+An interactive primer on finite elliptic curves. Continuous elliptic curves [here](https://www.geogebra.org/m/baurc6bu).
 "
 
 subtitle: "
@@ -755,6 +761,8 @@ callbacks:
         attr: value
       - id: sign-p-k
         attr: children
+      - id: sign-secret
+        attr: data
     output:
       - id: sign-params
         attr: children

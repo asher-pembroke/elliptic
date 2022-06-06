@@ -1,3 +1,4 @@
+* secret points
 
 # 2022-06-05 19:27:09.575308: clock-in
 
