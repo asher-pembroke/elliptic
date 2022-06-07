@@ -168,7 +168,7 @@ def multiply_graph(p_i, a, b, n, points, *args):
         if sharing_mode == 1:
             title_str += '\\textrm{'+'Public Key'+'}:'
         elif sharing_mode == 2:
-            title_str += '\\textrm{'+'Shared Secret'+'}:'
+            title_str += 'S = p_A H_B = p_B H_A = p_A p_B G_0'
         elif sharing_mode == 3:
             pass
 

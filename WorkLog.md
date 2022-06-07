@@ -1,3 +1,4 @@
+* finalizing talk
 * talk update
 # 2022-06-06 01:53:55.240274: clock-out
 
