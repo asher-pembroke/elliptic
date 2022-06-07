@@ -122,7 +122,9 @@ references: "# References
 
 Further reading:
 
-* Bitcon's [ECDSA](https://en.bitcoin.it/wiki/Elliptic_Curve_Digital_Signature_Algorithm) (can be used with other algorithms such as Schnorr)
+* Bitcon's [(Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.bitcoin.it/wiki/Elliptic_Curve_Digital_Signature_Algorithm)
+
+* [Schnorr Signatures](https://medium.com/coinmonks/on-bitcoins-schnorr-signature-algorithm-and-taproot-script-and-witness-sizes-fe4d1e6591a7) 
 
 * [An illustrated guide to elliptic curve cryptography validation](https://research.nccgroup.com/2021/11/18/an-illustrated-guide-to-elliptic-curve-cryptography-validation/)
 
@@ -133,6 +135,7 @@ Further reading:
 * [PGP](https://en.wikipedia.org/wiki/Pretty_Good_Privacy) [with elliptic curves](https://ieeexplore.ieee.org/abstract/document/7813870)
 
 * [support for secp256 in GPG](https://github.com/openpgpjs/openpgpjs/pull/628)
+
 "
 
 layout:
@@ -158,7 +161,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: signatures
+        active_tab: point-addition
         children:
         - dbc.Tab:
             tab_id: point-addition
