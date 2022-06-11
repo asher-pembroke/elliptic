@@ -1,3 +1,4 @@
+* debuged modinv code
 * refactoring notebooks, install instructions, split into two services
 
 # 2022-06-11 15:48:31.165558: clock-in

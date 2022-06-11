@@ -219,8 +219,8 @@ layout:
                                 options:
                                 - label: 'Multiply'
                                   value: 1
-                                # - label: 'Inverse'
-                                #   value: 2
+                                - label: 'Inverse'
+                                  value: 2
                                 value: 1
                                 inline: True
                         - dbc.Col:

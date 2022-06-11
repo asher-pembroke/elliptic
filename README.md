@@ -4,7 +4,7 @@ A hands-on tutorial on elliptic curves
 
 ### Lesson 0 - defining elliptic curves
 
-Continuous case uses geogebra. Visit the interactive curve companion page:
+The continuous case uses geogebra. Visit the interactive companion page here:
 
 https://www.geogebra.org/m/baurc6bu
 

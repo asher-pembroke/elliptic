@@ -760,3 +760,92 @@ import numpy as np
 ```
 
 $ (3, 4) $
+
+
+### mod inverse
+
+Adding mod inverse to the multiplication page
+
+```python
+def extended_gcd(aa, bb):
+    # from https://rosettacode.org/wiki/Modular_inverse#Python
+    lastremainder, remainder = abs(aa), abs(bb)
+    x, lastx, y, lasty = 0, 1, 1, 0
+    while remainder:
+        lastremainder, (quotient, remainder) = remainder, divmod(lastremainder, remainder)
+        x, lastx = lastx - quotient*x, x
+        y, lasty = lasty - quotient*y, y
+    return lastremainder, lastx * (-1 if aa < 0 else 1), lasty * (-1 if bb < 0 else 1)
+
+def modinv(a, m):
+    # from https://rosettacode.org/wiki/Modular_inverse#Python
+    g, x, y = extended_gcd(a, m)
+    if g != 1:
+        raise ValueError
+    return x % m
+```
+
+```python
+def modinv_song(a, b):
+    """from Jimmy Song"""
+    return pow(a, b - 2, b) 
+```
+
+```python
+p_ = 37
+
+for _ in [-3, 5, 10, 36, 37, 39]:
+    try:
+        assert (modinv_song(_, p_)*(_))%p_ == 1
+        print(f"{_}^-1 mod {p_} = {modinv_song(_, p_)}")
+    except ValueError:
+        print(f'ValueError: could not calculate {_}^-1 mod {p_}')
+    except AssertionError:
+        print(f'AssertionError: could not calculate {_}^-1 mod {p_}')
+        
+```
+
+with Jimmy's version, mod inverse of 37 returns 0. With the rosetta version, modinv of 37 raises a value error. I guess it makes sense not to divide by zero in the first place.
+
+```python
+modinv_song(0, 37)
+```
+
+```python
+modinv_song(37, 37)
+```
+
+See if $kk^{-1} P = P$
+
+
+Must choose a prime field!
+
+```python
+G_ = Point(x=FieldElement(18, 37),
+           y=FieldElement(17, 37),
+           a=FieldElement(0, 37),
+           b=FieldElement(7, 37)
+          )
+G_
+```
+
+The above point has a prime subfield of size 13
+
+```python
+k = 3
+```
+
+```python
+n_ = 13
+```
+
+```python
+for k in [-3%n_, 3, 5, 7, 15]:
+    assert k*(modinv_song(k, n_)*G_) == G_
+```
+
+The above tests pass! We should be able to add the invsere to the dashboard, so long as we're taking n to be the size of the subgroup!
+
+```python
+
+```
