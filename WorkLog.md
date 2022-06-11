@@ -1,3 +1,5 @@
+# 2022-06-11 17:17:13.377418: clock-out
+
 * debuged modinv code
 * refactoring notebooks, install instructions, split into two services
 
