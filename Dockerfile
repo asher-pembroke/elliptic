@@ -27,7 +27,7 @@ RUN pip install dash-bootstrap-components
 RUN pip install dash_daq
 RUN pip install cryptography
 
-RUN git clone https://github.com/jimmysong/programmingbitcoin.git /home/programmingbitcoin
+RUN git clone --depth 1 https://github.com/jimmysong/programmingbitcoin.git /home/programmingbitcoin
 
 # CMD jupyter notebook . --port=8888 --no-browser --ip=0.0.0.0 --allow-root
 
