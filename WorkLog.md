@@ -1,3 +1,4 @@
+* demo to Timechain Academy
 
 # 2022-06-18 09:14:09.244496: clock-in
 
@@ -15,6 +16,7 @@
 
 * finalizing talk
 * talk update
+
 # 2022-06-06 01:53:55.240274: clock-out
 
 * signing
