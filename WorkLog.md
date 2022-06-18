@@ -1,3 +1,5 @@
+# 2022-06-18 11:53:17.278556: clock-out
+
 * demo to Timechain Academy
 
 # 2022-06-18 09:14:09.244496: clock-in
