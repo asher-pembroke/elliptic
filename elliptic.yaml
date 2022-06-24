@@ -161,7 +161,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: point-addition
+        active_tab: point-multiplication
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -214,14 +214,14 @@ layout:
                         - dbc.Col:
                             width: 2
                             children:
-                            - dbc.RadioItems:
+                            - dbc.Checklist:
                                 id: multiply-mode
                                 options:
                                 - label: 'Multiply'
                                   value: 1
                                 - label: 'Inverse'
                                   value: 2
-                                value: 1
+                                value: [1]
                                 inline: True
                         - dbc.Col:
                             width: 2

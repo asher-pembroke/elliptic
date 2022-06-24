@@ -21,6 +21,8 @@ logging.basicConfig(filename='elliptic.log',
 
 sys.path.append('../programmingbitcoin/code-ch03/')
 
+sys.path.append('/home/programmingbitcoin/code-ch03')
+
 from ecc import Point, FieldElement
 
 
@@ -248,7 +250,7 @@ def extended_gcd(aa, bb):
         x, lastx = lastx - quotient*x, x
         y, lasty = lasty - quotient*y, y
     return lastremainder, lastx * (-1 if aa < 0 else 1), lasty * (-1 if bb < 0 else 1)
- 
+
 def modinv(a, m):
     # from https://rosettacode.org/wiki/Modular_inverse#Python
     if m not in primes_:
@@ -257,6 +259,19 @@ def modinv(a, m):
     if g != 1:
         raise ValueError
     return x % m
+
+G_ = Point(x=FieldElement(18, 37),
+           y=FieldElement(17, 37),
+           a=FieldElement(0, 37),
+           b=FieldElement(7, 37)
+          )
+G_
+
+n_ = 13
+
+for k in [-3%n_, 3, 5, 7, 15]: # 0^-1 does not exist
+    assert k*(modinv(k, n_)*G_) == G_
+
 
 def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     """multiply points by n"""
@@ -289,7 +304,7 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     title_str += f"\quad N:{order_}"
 
     if points is not None:
-        curve_key = str((p,a,b,mode))
+        curve_key = str((p, a, b, mode))
         if curve_key in points:
             pts = points[curve_key]
             if len(pts) > 0:
@@ -305,15 +320,23 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
                     showlegend=False,)
                 fig.add_trace(base_point)
 
-                if mode == 1:
+                if 1 in mode:
                     title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
-                elif mode == 2:
-                    title_str += '\qquad {}^'.format(str(n))
-                    title_str += '{-1}'
-                    title_str += '\cdot {}'.format(str((x_0, y_0)))
+                    if n == 0:
+                        title_str += ' = \infty'
+                elif 2 in 2:
+                    # check if mod inverse exists for this point
+                    n = n%subgroup_order_
+                    if n != 0:
+                        title_str += '\qquad {}^'.format(str(n))
+                        title_str += '{-1}'
+                        title_str += '\cdot {}'.format(str((x_0, y_0)))
+                    else:
+                        title_str += '\qquad {0}^{-1}'
+                        title_str += '\cdot {}'.format(str((x_0, y_0)))
+                        title_str += ' = \\textrm{DNE}'
 
-                if n == 0:
-                    title_str += ' = \infty'
+
 
                 if show_subgroup:
                     x_ = []
@@ -463,7 +486,6 @@ def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
 
     p = primes_[p_i]
 
-    print(mode)
     logging.debug('mode :{}'.format(mode))
 
     curve_key = str((p, a, b, mode))
@@ -488,12 +510,17 @@ def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
         except ValueError:
             raise PreventUpdate
 
-        if mode == 2:
+        if 2 in mode:
+            logging.debug('inverse, mode = {}'.format(mode))
             subgroup_order_ = subgroup_order(G_0)
-            print('subgroup order of G_0 {}'.format(subgroup_order_))
-            p_n = modinv(n, p)*G_0
+            logging.debug('subgroup order of G_0 {} {}'.format(G_0, subgroup_order_))
+            n = n%subgroup_order_
+            if n != 0:
+                p_n = modinv(n%subgroup_order_, subgroup_order_)*G_0
+            else:
+                p_n = Point(None, None, None, None)
         else:
-            print('no inverse, mode = {}'.format(mode))
+            logging.debug('no inverse, mode = {}'.format(mode))
             p_n = n*G_0
         if p_n.x is not None:
             points.append((p_n.x.num, p_n.y.num))
@@ -633,7 +660,6 @@ def subgroup_order(P):
         if P_.x is None:
             break
     return _
-
 
 
 def get_fernet(key_str):

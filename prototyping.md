@@ -841,11 +841,12 @@ n_ = 13
 
 ```python
 for k in [-3%n_, 3, 5, 7, 15]:
+    assert k*(modinv(k, n_)*G_) == G_
+```
+
+```python
+for k in [-3%n_, 3, 5, 7, 15]:
     assert k*(modinv_song(k, n_)*G_) == G_
 ```
 
 The above tests pass! We should be able to add the invsere to the dashboard, so long as we're taking n to be the size of the subgroup!
-
-```python
-
-```
