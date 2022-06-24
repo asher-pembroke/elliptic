@@ -1,3 +1,6 @@
+
+# 2022-06-24 17:21:45.801883: clock-in
+
 # 2022-06-24 16:01:44.421574: clock-out
 
 * got inverse permuations to display correctly
