@@ -1,3 +1,6 @@
+
+# 2022-06-24 14:14:44.234252: clock-in
+
 # 2022-06-23 22:20:03.993224: clock-out
 
 * got modinv working in dashboard
