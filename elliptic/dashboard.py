@@ -109,6 +109,18 @@ def get_pnt_annotation(x, y, text):
 def point_str(x, y):
     return "({},{})".format(x,y)
 
+def is_prime(n):
+    prime_flag = 0
+      
+    if(n > 1):
+        for i in range(2, int(np.sqrt(n)) + 1):
+            if (n % i == 0):
+                prime_flag = 1
+                break
+        if (prime_flag == 0):
+            return True
+    return False
+
 def show_hide_pub(mode):
     # show the pub key
     if mode == 1:
@@ -253,8 +265,8 @@ def extended_gcd(aa, bb):
 
 def modinv(a, m):
     # from https://rosettacode.org/wiki/Modular_inverse#Python
-    if m not in primes_:
-        raise ValueError('{} not in first 100 primes!'.format(m))
+    if not is_prime(m):
+        raise ValueError('{} is not prime!'.format(m))
     g, x, y = extended_gcd(a, m)
     if g != 1:
         raise ValueError
@@ -278,6 +290,7 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     if n is None:
         raise PreventUpdate
 
+    error_msg = ''
     ctx = dash.callback_context
 
     active_tab = 'point-multiplication'
@@ -307,6 +320,9 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
         curve_key = str((p, a, b, mode))
         if curve_key in points:
             pts = points[curve_key]
+
+            rhs_str = ''
+
             if len(pts) > 0:
                 x_0, y_0 = pts[0]
                 G_0 = point_in_curve(x_0, y_0, p, a, b)
@@ -320,23 +336,35 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
                     showlegend=False,)
                 fig.add_trace(base_point)
 
+                title_str += '\\quad '
+
+                lhs_strs = []
+
+                does_not_exist = False 
+                divide_by_zero = False
+
                 if 1 in mode:
-                    title_str += '\qquad {} \cdot {}'.format(str(n), str((x_0, y_0)))
-                    if n == 0:
-                        title_str += ' = \infty'
-                elif 2 in 2:
+                    lhs_strs.append('\\quad {}'.format(str(n)))
+                if 2 in mode:
                     # check if mod inverse exists for this point
+                    if not is_prime(subgroup_order_):
+                        does_not_exist = True
+                        error_msg = 'inverse requires prime subgroup!'
+
                     n = n%subgroup_order_
-                    if n != 0:
-                        title_str += '\qquad {}^'.format(str(n))
-                        title_str += '{-1}'
-                        title_str += '\cdot {}'.format(str((x_0, y_0)))
-                    else:
-                        title_str += '\qquad {0}^{-1}'
-                        title_str += '\cdot {}'.format(str((x_0, y_0)))
-                        title_str += ' = \\textrm{DNE}'
+                    if n == 0:
+                        divide_by_zero = True
 
+                    lhs_strs.append('{}^'.format(str(n))+'{-1}') # n^{-1}
 
+                lhs_strs.append(str((x_0, y_0)))
+
+                title_str += '\cdot '.join(lhs_strs)
+
+                if does_not_exist:
+                    rhs_str = ' = \\textrm{DNE}'
+                elif divide_by_zero:
+                    rhs_str = ' = \\textrm{DIV0}'
 
                 if show_subgroup:
                     x_ = []
@@ -367,19 +395,30 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
                     showlegend=False)
                 fig.add_trace(n_point)
 
+            
                 if n == 0:
-                    pass
+                    if divide_by_zero:
+                        pass
+                    else:
+                        rhs_str += ' = \infty'
                 elif x_n == -1:
-                    title_str += ' = \infty'
+                    rhs_str += ' = \infty'
                 else:
-                    title_str += ' = {}'.format(str((x_n, y_n)))
+                    rhs_str += ' = {}'.format(str((x_n, y_n)))
+
+            title_str += rhs_str
+
+
 
             if len(pts) > 0:
-                title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
+                title_str += " \quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
 
-            for p_ in pts:
+            for i, p_ in enumerate(pts):
                 x_, y_ = p_
-                fig.add_annotation(**get_pnt_annotation(x_, y_, str((x_, y_))))
+                if i == 0:
+                    fig.add_annotation(**get_pnt_annotation(x_, y_, str((x_, y_))))
+                elif not does_not_exist:    
+                    fig.add_annotation(**get_pnt_annotation(x_, y_, str((x_, y_))))
 
     fig.update_layout(dict(
                 xaxis=dict(range=[0,p-1]),
@@ -391,7 +430,7 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     else:
         fig.update_layout(width=700, height=700)
 
-    return fig
+    return fig, error_msg
 
 def priv_in_bounds(p_i, a, b, clickData, current_priv):
     """set bounds of the private key"""
@@ -510,18 +549,23 @@ def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
         except ValueError:
             raise PreventUpdate
 
+        p_n = G_0
+
         if 2 in mode:
             logging.debug('inverse, mode = {}'.format(mode))
             subgroup_order_ = subgroup_order(G_0)
             logging.debug('subgroup order of G_0 {} {}'.format(G_0, subgroup_order_))
-            n = n%subgroup_order_
-            if n != 0:
-                p_n = modinv(n%subgroup_order_, subgroup_order_)*G_0
+            if not is_prime(subgroup_order_):
+                points.append((-1, -1))
             else:
-                p_n = Point(None, None, None, None)
-        else:
+                n = n%subgroup_order_
+                if n != 0:
+                    p_n = modinv(n%subgroup_order_, subgroup_order_)*G_0
+                else:
+                    p_n = Point(None, None, None, None)
+        if 1 in mode:
             logging.debug('no inverse, mode = {}'.format(mode))
-            p_n = n*G_0
+            p_n = n*p_n
         if p_n.x is not None:
             points.append((p_n.x.num, p_n.y.num))
         else:

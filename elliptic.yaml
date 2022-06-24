@@ -216,6 +216,7 @@ layout:
                             children:
                             - dbc.Checklist:
                                 id: multiply-mode
+                                switch: True
                                 options:
                                 - label: 'Multiply'
                                   value: 1
@@ -233,6 +234,8 @@ layout:
                                   value: 1
                                 value: []
                                 switch: True
+                            - html.Div:
+                                id: multiply-inverse-message
 
                     - dcc.Graph:
                         id: multiply-graph
@@ -840,6 +843,8 @@ callbacks:
     output:
       - id: multiply-graph
         attr: figure
+      - id: multiply-inverse-message
+        attr: children
     callback: elliptic.dashboard.multiply_inverse_graph
 
   update_slider_label:

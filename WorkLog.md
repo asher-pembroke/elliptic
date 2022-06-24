@@ -1,3 +1,4 @@
+* got inverse permuations to display correctly
 
 # 2022-06-24 14:14:44.234252: clock-in
 

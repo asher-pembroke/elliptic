@@ -411,6 +411,10 @@ Trick is
 ## Prime divisors
 
 ```python
+import numpy as np
+```
+
+```python
 def is_prime(n):
     prime_flag = 0
       
@@ -423,6 +427,12 @@ def is_prime(n):
             return True
     return False
 
+def divisors(n):
+    for i in range(1, int(n / 2) + 1):
+        if n % i == 0:
+            yield i
+    yield n
+
 def prime_divisor(n):
     """find the largest prime divisor of n"""
     for _ in list(divisors(n))[::-1]:
@@ -433,6 +443,18 @@ def cofactor(order, n):
     return int(order/n)
 
 prime_divisor(42)
+```
+
+```python
+39/3
+```
+
+```python
+is_prime(39)
+```
+
+```python
+is_prim
 ```
 
 ```python
