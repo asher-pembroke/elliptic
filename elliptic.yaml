@@ -12,8 +12,9 @@ external_stylesheets:
   - https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css
 
 external_scripts:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML
   # - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML
-  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/latest?tex-mml-chtml.js
+  # - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/latest?tex-mml-chtml.js
 
 app:
   jupyter_dash.JupyterDash:
@@ -27,6 +28,8 @@ run_server:
   port: 8050
   extra_files:
     - elliptic.yaml
+    - problems.yaml
+    - ellitic/dashboard.py
   debug: True
 
 input_p:
@@ -83,7 +86,12 @@ empty_graph:
       ticks: ''
       showgrid: False
       zeroline: False
-
+    # margin:
+    #   l: 0 #left margin
+    #   r: 0 #right margin
+    #   b: 0 #bottom margin
+    #   t: 0 #top margin
+    # width: 500
 
 
 references_secp256: "### References
@@ -141,6 +149,8 @@ Further reading:
 layout:
   dbc.Container:
     children:
+    - dcc.Location:
+        id: url
     - dbc.Row:
         children:
         - dbc.Col:
@@ -236,13 +246,23 @@ layout:
                                 switch: True
                             - html.Div:
                                 id: multiply-inverse-message
+                    - dbc.Row:
+                        children:
+                        - dbc.Col:
+                            width: 8
+                            children:
+                            - dcc.Graph:
+                                id: multiply-graph
+                                mathjax: True
+                                config:
+                                  displayModeBar: False
+                                figure: ${empty_graph}
+                        - dbc.Col:
+                            width: 4
+                            children:
+                            - html.Div:
+                                id: multiply-problem-set
 
-                    - dcc.Graph:
-                        id: multiply-graph
-                        mathjax: True
-                        config:
-                          displayModeBar: False
-                        figure: ${empty_graph}
         - dbc.Tab:
             tab_id: secret-sharing
             label: Secret Sharing
@@ -846,6 +866,16 @@ callbacks:
       - id: multiply-inverse-message
         attr: children
     callback: elliptic.dashboard.multiply_inverse_graph
+
+  load_multiply_problems:
+    input:
+      - id: url
+        attr: pathname
+    output:
+      - id: multiply-problem-set
+        attr: children
+    callback: elliptic.dashboard.load_multiply_problems
+
 
   update_slider_label:
     input:

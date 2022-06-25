@@ -9,6 +9,9 @@ import logging
 from cryptography.fernet import Fernet, InvalidToken
 import base64
 import json
+from omegaconf import OmegaConf
+import dash_bootstrap_components as dbc
+import dash.html as html
 
 from cryptography.hazmat.primitives import hashes
 
@@ -24,7 +27,7 @@ sys.path.append('../programmingbitcoin/code-ch03/')
 sys.path.append('/home/programmingbitcoin/code-ch03')
 
 from ecc import Point, FieldElement
-
+from dash import dcc
 
 def get_primes(n):
     from itertools import count, islice
@@ -423,6 +426,9 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     fig.update_layout(dict(
                 xaxis=dict(range=[0,p-1]),
                 yaxis=dict(range=[0,p-1]),
+                width=400,
+                height=400,
+                # margin=dict(l=0,r=0),
                 title="$ {} $".format(title_str)))
 
     if active_tab == 'secret-sharing':
@@ -879,5 +885,29 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
 
 
+def input_type(id_, type_):
+    if type_ == 'int':
+        return dbc.Input(id_, type='number', step=1)
+    return html.Div()
+
+
+problems = OmegaConf.to_container(OmegaConf.load('problems.yaml'))
+
+def load_multiply_problems(url):
+    problem_set = []
+    for i, problem in enumerate(problems['multiply']):
+        problem_set.append(dcc.Markdown(children=problem['question']))
+        problem_set.append(
+            dbc.Row(children=[
+                dbc.Col(children=[input_type('multiply-answer-{i}', problem['type'])]),
+                # dbc.Col(children=[html.Div(id='multiply-validate-{i}')])
+                ])
+            )
+        
+    return problem_set
+
+# def validate_answer(problem_set, answer):
+#     problems[problem_set][]
+#     return True
 
 
