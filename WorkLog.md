@@ -1,3 +1,4 @@
+* adding hourly
 # 2022-06-25 15:48:20.085262: clock-out
 
 * Timechain Academy lecture

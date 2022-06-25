@@ -1,0 +1,4 @@
+
+repo:
+  errant_clocks: # list of commit hashes to skip
+    - 35f1a91b98945e517a0fc46df35b86876191c930
