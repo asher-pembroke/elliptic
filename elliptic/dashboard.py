@@ -699,11 +699,16 @@ def divisors(n):
     yield n
 
 def subgroup_order(P):
+    """find the subgroup order of input P
+    
+    For prime field of size N, the subgroup order for P
+    is the smallest divisor n of N s.t. n*P = inf
+    """
     p = P.x.prime
     a = P.a.num
     b = P.b.num
 
-    N = order(p, a, b)
+    N = order(p, a, b) # brute force
     
     for _ in divisors(N):
         P_ = _*P

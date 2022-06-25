@@ -111,18 +111,18 @@ or .0012 x number of atoms in the known universe!
 
 title: "
 ## Finite Elliptic Curves
-
-### BTC++  June 7, 2022 - Austin TX
  
 An interactive primer on finite elliptic curves. Continuous elliptic curves [here](https://www.geogebra.org/m/baurc6bu).
 "
 
 subtitle: "
-#### Asher Pembroke
 
-BTC++
 
-June 7, 2022 Austin TX
+* Developed by Asher Pembroke for Timechain Academy
+
+* Sponsored by Satoshi Energy
+
+* Presented at BTC++, June 7, 2022 Austin TX
 
 "
 
@@ -154,7 +154,7 @@ layout:
     - dbc.Row:
         children:
         - dbc.Col:
-            width: 8
+            width: 4
             children:
             - dcc.Markdown: ${title}
         - dbc.Col:
@@ -162,6 +162,12 @@ layout:
             children:
             - html.Br:
             - dcc.Markdown: ${subtitle}
+        - dbc.Col:
+            width: 4
+            children:
+              html.Img:
+                src: satoshi_energy_logo
+                height: 30px
     - dbc.Row:
         children:
         - dbc.Col:

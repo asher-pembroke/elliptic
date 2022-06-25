@@ -26,14 +26,5 @@ if 'callbacks' in conf:
     assign_callbacks(callbacks, conf['callbacks'])
 
 
-# conf = OmegaConf.to_container(conf, resolve=True)
-# -
 if __name__ == '__main__':
-    # app.run_server(host='0.0.0.0',
-    #                port=8050,
-    #                mode='external',
-    #                extra_files=["elliptic.yaml", "elliptic/dashboard.py"],
-    #                debug=True)
     app.run_server(**conf['run_server'])
-
-
