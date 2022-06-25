@@ -759,7 +759,7 @@ def get_triggered():
     """retrieve id of the triggered element"""
     ctx = dash.callback_context
     if not ctx.triggered:
-        button_id = 'No clicks yet'
+        button_id = ''
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -804,8 +804,13 @@ def sha256(message):
     digest.update(b"123")
     return digest.finalize()
 
-def get_z(message, size_):
-    z = int.from_bytes(sha256(message)[:size_], "big")
+def get_z(message, size_=30):
+    """assign a somewhat unique integer to an input message
+    size_: the number of bytes to use from the sha256 hash of the message
+
+    note: input will be cast into string before hashing
+    """
+    z = int.from_bytes(sha256(str(message))[:size_], "big")
     return z
 
 def get_s(k, z, r, d_a, n):
@@ -885,9 +890,9 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
 
 
-def input_type(id_, type_):
+def input_type(kind, id_, type_):
     if type_ == 'int':
-        return dbc.Input(id_, type='number', step=1)
+        return dbc.Input(id=dict(kind=kind, index=id_), type='number', step=1)
     return html.Div()
 
 
@@ -895,19 +900,52 @@ problems = OmegaConf.to_container(OmegaConf.load('problems.yaml'))
 
 def load_multiply_problems(url):
     problem_set = []
-    for i, problem in enumerate(problems['multiply']):
+    for i, problem in enumerate(problems['point-multiplication']):
         problem_set.append(dcc.Markdown(children=problem['question']))
         problem_set.append(
             dbc.Row(children=[
-                dbc.Col(children=[input_type('multiply-answer-{i}', problem['type'])]),
-                # dbc.Col(children=[html.Div(id='multiply-validate-{i}')])
+                dbc.Col(children=[input_type('point-multiplication', i, problem['type'])]),
+                dbc.Col(children=[html.Div(id=dict(kind='point-multiplication-render', index=i))])
                 ])
             )
         
     return problem_set
 
-# def validate_answer(problem_set, answer):
-#     problems[problem_set][]
-#     return True
+def render_user_answer(answer):
+
+    triggered = get_triggered()
+    if triggered == '':
+        raise PreventUpdate
+    return triggered
+
+def validate_user_answer(answer):
+
+    answer = str(answer)
+
+
+    triggered = get_triggered()
+    logging.debug("triggered ({}): {}".format(type(triggered), triggered))
+    if ':' not in triggered:
+        raise PreventUpdate
+
+    if len(answer) == 0:
+        return False, False, ''
+
+    triggered_dict = json.loads(triggered)
+    problem_set = triggered_dict['kind']
+    problem_index = triggered_dict['index']
+    problem = problems[problem_set][problem_index]
+
+    z30 = get_z(answer, 30)
+    logging.debug(answer, z30, problem['answer_z30'])
+
+    valid = problem['answer_z30'] == z30
+    invalid = not valid
+    if valid:
+        message = 'correct!'
+    else:
+        message = 'incorrect'
+
+    return valid, invalid, message
 
 

@@ -876,6 +876,47 @@ callbacks:
         attr: children
     callback: elliptic.dashboard.load_multiply_problems
 
+  # @app.callback(
+  #     Output({'type': 'dynamic-output', 'index': MATCH}, 'children'),
+  #     Input({'type': 'dynamic-dropdown', 'index': MATCH}, 'value'),
+  #     State({'type': 'dynamic-dropdown', 'index': MATCH}, 'id'),
+  # )
+  # def display_output(value, id):
+  #     return html.Div('Dropdown {} = {}'.format(id['index'], value))
+
+  # render_user_answer:
+  #   input:
+  #     - id:
+  #         kind: point-multiplication
+  #         index: MATCH
+  #       attr: value
+  #   output:
+  #     - id:
+  #         kind: point-multiplication-render
+  #         index: MATCH
+  #       attr: children
+  #   callback: elliptic.dashboard.render_user_answer
+
+  validate_user_answer:
+    input:
+      - id:
+          kind: point-multiplication
+          index: MATCH
+        attr: value
+    output:
+      - id:
+          kind: point-multiplication
+          index: MATCH
+        attr: valid
+      - id:
+          kind: point-multiplication
+          index: MATCH
+        attr: invalid
+      - id:
+          kind: point-multiplication-render
+          index: MATCH
+        attr: children
+    callback: elliptic.dashboard.validate_user_answer  
 
   update_slider_label:
     input:

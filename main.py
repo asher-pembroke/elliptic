@@ -14,16 +14,26 @@
 # ---
 
 # +
-from psidash.psidash import load_app
+from omegaconf import OmegaConf
+from psidash.psidash import load_app, load_conf, load_dash, load_components, get_callbacks, assign_callbacks
 
-app = load_app(__name__, 'elliptic.yaml')
+conf = load_conf('elliptic.yaml')
+app = load_dash(__name__, conf['app'], conf.get('import'))
+app.layout = load_components(conf['layout'], conf.get('import'))
 
-if __name__ == '__main__':
-    app.run_server(host='0.0.0.0',
-                   port=8050,
-                   mode='external',
-                   extra_files=["elliptic.yaml", "elliptic/dashboard.py"],
-                   debug=True)
+if 'callbacks' in conf:
+    callbacks = get_callbacks(app, conf['callbacks'])
+    assign_callbacks(callbacks, conf['callbacks'])
+
+
+# conf = OmegaConf.to_container(conf, resolve=True)
 # -
+if __name__ == '__main__':
+    # app.run_server(host='0.0.0.0',
+    #                port=8050,
+    #                mode='external',
+    #                extra_files=["elliptic.yaml", "elliptic/dashboard.py"],
+    #                debug=True)
+    app.run_server(**conf['run_server'])
 
 

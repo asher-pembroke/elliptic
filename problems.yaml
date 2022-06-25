@@ -1,0 +1,12 @@
+
+# keys are named after the active tab
+point-multiplication:
+  - question: "1. For the elliptic curve defined by `a=0, b=7,` embedded in the finite field `p=37` and assuming the generator point `(4,21)`, for what value of `n` does
+
+    $$ n \\cdot (4,21) = (17,6) ?$$ 
+    "
+    answer_z30: 549516647274971155777071687216285332626710447182863909153224867459819694
+    type: int
+  - question: 2. Is the moon made of cheese?
+    answer: yes
+    type: bool
