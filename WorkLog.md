@@ -1,6 +1,5 @@
+* Timechain Academy lecture
 # 2022-06-25 13:28:32.802007: clock-in
-
-# 2022-06-25 12:46:46.819327: clock-out
 
 * ecdsa
 

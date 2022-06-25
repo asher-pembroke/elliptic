@@ -1,15 +1,22 @@
-###  Problem sets
+```python
+%load_ext autoreload
 
+%autoreload 2
+```
+
+###  Problem sets
 
 This notebook may be used to generate answers to problem sets that can be stored in the git repo.
 
 However, we don't want to store the actual answers in the git repo. Instead, we store something like a hash of the answer and compare against that on the fly.
 
-
 ### Problem definitions
 
-
 The base of the repo stores `problems.yaml` which will containing both the problems and their.
+
+```python
+!echo 'hello'
+```
 
 ```python
 cat problems.yaml
@@ -38,10 +45,14 @@ from omegaconf import OmegaConf # may be overkill, but has some merits
 problems = OmegaConf.to_container(OmegaConf.load('problems.yaml')) # cast into dictionary
 ```
 
+```python
+problems
+```
+
 Let's get the problem question from the `point-multiplication` section.
 
 ```python
-problem = problems['point-multiplication'][0] # get first answer
+problem = problems['point-multiplication'][0] # get first problem
 ```
 
 ```python
@@ -50,7 +61,8 @@ question # latex will be rendered if you copy and paste this into a markdown cel
 ```
 
 1. For the elliptic curve defined by `a=0, b=7,` embedded in the finite field `p=37` and assuming the generator point `(4,21)`, for what value of `n` does
-$$ n \cdot (4,21) = (17,6) ?$$ 
+
+$$ n \\cdot (4,21) = (17,6) ?$$ 
 
 ```python
 answer_z30 = problem['answer_z30'] 
@@ -61,13 +73,23 @@ The above "answer" comes from hash of the real answer (which happens to be 5). H
 
 ```python
 from elliptic.dashboard import get_z
-```
 
-```python
 help(get_z)
 ```
 
+```python
+get_z('my messag e')
+```
+
 Check that the answer matches what we expect
+
+```python
+get_z(3)
+```
+
+```python
+answer_z30
+```
 
 ```python
 assert answer == get_z('5')

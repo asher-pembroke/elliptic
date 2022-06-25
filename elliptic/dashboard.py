@@ -672,6 +672,13 @@ def render_points(p_i, a, b, points):
             return points_str
 
 def point_in_curve(x, y, p, a, b):
+    """return a point in a finite field given raw parameters:
+
+    x, y - point coordinates
+    p - prime number
+    a, b: parameters of the curve y^2 = x^3 + ax + b
+
+    """
     try:
         return Point(FieldElement(x, p),
                     FieldElement(y, p),

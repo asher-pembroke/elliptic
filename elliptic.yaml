@@ -120,9 +120,9 @@ subtitle: "
 
 * Developed by Asher Pembroke for Timechain Academy
 
-* Sponsored by Satoshi Energy
+* Sponsored by [Satoshi Energy](https://www.satoshienergy.com/)
 
-* Presented at BTC++, June 7, 2022 Austin TX
+* Presented at [BTC++, June 7, 2022 Austin TX](https://youtu.be/im1-IzaSjXI)
 
 "
 
@@ -154,7 +154,7 @@ layout:
     - dbc.Row:
         children:
         - dbc.Col:
-            width: 4
+            width: 8
             children:
             - dcc.Markdown: ${title}
         - dbc.Col:
@@ -162,12 +162,15 @@ layout:
             children:
             - html.Br:
             - dcc.Markdown: ${subtitle}
-        - dbc.Col:
-            width: 4
-            children:
-              html.Img:
-                src: satoshi_energy_logo
-                height: 30px
+        # - dbc.Col:
+        #     width: 4
+        #     children:
+        #       html.Img:
+        #         src: assets/satoshi_energy_logo.png
+        #         height: 30px
+        #         style:
+        #           padding: 10px,10px,10px,10px
+        #           background: grey
     - dbc.Row:
         children:
         - dbc.Col:

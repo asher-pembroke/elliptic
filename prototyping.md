@@ -454,10 +454,6 @@ is_prime(39)
 ```
 
 ```python
-is_prim
-```
-
-```python
 e1 = dict(p=29, a=-1, b=1)
 
 order(**e1)
@@ -724,7 +720,7 @@ u_2
 ```
 
 ```python
-assert u_1*G_ + u_2*H_a == P_
+assert u_1*G_ + u_2*H_a == P_ # signature confirmed!
 ```
 
 # Dashboard

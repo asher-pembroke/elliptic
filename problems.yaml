@@ -7,6 +7,22 @@ point-multiplication:
     "
     answer_z30: 549516647274971155777071687216285332626710447182863909153224867459819694
     type: int
-  - question: 2. Is the moon made of cheese?
-    answer: yes
-    type: bool
+
+  - question: "2. For the elliptic curve defined by `a=0, b=7,` embedded in the finite field `p=277` and assuming the generator point `(144,138)`, for what value of `n` does
+
+    $$ n \\cdot (144,138) = (28,82)$$ 
+    "
+    answer_z30: 414912929693805082924331759683438763286184106140338540213609816714212981
+    type: int
+
+  - question: "3. For the elliptic curve defined by `a=0, b=7, p=37` and generator point `(18, 17)`. if
+
+    $$ 3 \\cdot (18, 17)=(32,17)$$ 
+    
+    for what value `n` does
+
+    $$ n^{-1} \\cdot (32,17) = (18,17) $$
+
+    "
+    answer_z30: 1528029186047959948733631850005999857860542493275095102440163969123032744
+    type: int
