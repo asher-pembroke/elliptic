@@ -1,3 +1,6 @@
+
+# 2022-07-02 14:17:08.839376: clock-in
+
 # 2022-07-02 13:51:56.807471: clock-out: T-20m 
 
 * ecdsa scheme working
