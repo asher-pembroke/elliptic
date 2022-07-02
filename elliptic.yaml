@@ -269,8 +269,11 @@ layout:
                         - dbc.Col:
                             width: 4
                             children:
-                            - html.Div:
-                                id: multiply-problem-set
+                            - html.Details:
+                                children:
+                                - html.Summary: Click to expand problem set
+                                - html.Div:
+                                    id: multiply-problem-set
 
         - dbc.Tab:
             tab_id: secret-sharing

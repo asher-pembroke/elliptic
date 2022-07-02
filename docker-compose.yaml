@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
-      - "8051:8050"
+      - "8051:8051"
     command:
     - jupyter
     - notebook
