@@ -41,6 +41,12 @@ help(point_in_curve)
 e1 = dict(p=29, a=-1%29, b=1) # define eliptic curve parameters
 ```
 
+## Choose priv key
+
+```python
+d_A = 7 # private key - do not share!
+```
+
 ### Choose generator point
 
 ```python
@@ -70,7 +76,7 @@ n_G0 * G_0 # check that n_G0 is truly the subgroup order of G_0
 ### Choose k
 
 ```python
-k = 3
+k = 5
 k
 ```
 
@@ -85,9 +91,8 @@ P
 
 ```python
 r = P.x.num%n_G0
+assert r != 0 # if r = 0: start over with a new k
 r
-
-assert r != 0 # if r = 0, start over with a new k
 ```
 
 ### create message to sign
@@ -104,6 +109,7 @@ from elliptic.dashboard import get_z
 
 ```python
 z = get_z(message)
+z
 ```
 
 ### compute signature $s = k^{-1}(z+rd_A) mod(n_{G_0})$
@@ -115,7 +121,41 @@ help(modinv)
 ```
 
 ```python
-s = modinv(k, n_G0)*(z + r*)
+s = (modinv(k, n_G0)*(z + r*d_A))%n_G0
+assert s != 0 # if s=0: start again wth another k
+s
+```
+
+## Verify
+
+
+Get Alice's pub key
+
+```python
+H_A = d_A*G_0
+H_A
+```
+
+### calculate $u_1 = s^{-1} z mod n$
+
+```python
+u_1 = (modinv(s, n_G0)*z)%n_G0
+u_1
+```
+
+### calculate $u_2 = s^{-1} r mod n$
+
+```python
+u_2 = (modinv(s, n_G0)*r)%n_G0
+u_2
+```
+
+```python
+assert u_1*G_0 + u_2*H_A == P # verified?
+```
+
+```python
+assert r == P.x.num % n_G0 # verified
 ```
 
 ```python

@@ -180,7 +180,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: point-multiplication
+        active_tab: signatures #point-multiplication
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -280,7 +280,6 @@ layout:
                                 - html.Summary: Click to expand problem set
                                 - html.Div:
                                     id: multiply-problem-set
-
         - dbc.Tab:
             tab_id: secret-sharing
             label: Secret Sharing
@@ -595,12 +594,12 @@ layout:
                         - dbc.Col:
                             width: 6
                             children:
-                              dcc.Graph:
-                                id: validate-graph
-                                mathjax: True
-                                config:
-                                  displayModeBar: False
-                                figure: ${empty_graph}
+                              # dcc.Graph:
+                              #   id: validate-graph
+                              #   mathjax: True
+                              #   config:
+                              #     displayModeBar: False
+                              #   figure: ${empty_graph}
         - dbc.Tab:
             tab_id: references
             label: References
@@ -829,20 +828,20 @@ callbacks:
     callback: elliptic.dashboard.render_sign_params
 
 
-  update_validate_graph:
-    input:
-      - id: user-input-p
-        attr: value
-      - id: user-input-a
-        attr: value
-      - id: user-input-b
-        attr: value
-      - id: validate-points
-        attr: data
-    output:
-      - id: validate-graph
-        attr: figure
-    callback: elliptic.dashboard.add_graph
+  # update_validate_graph:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: validate-points
+  #       attr: data
+  #   output:
+  #     - id: validate-graph
+  #       attr: figure
+  #   callback: elliptic.dashboard.add_graph
 
 
 
