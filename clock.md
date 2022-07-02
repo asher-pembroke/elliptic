@@ -3,29 +3,7 @@ from jupyter_dash import JupyterDash
 ```
 
 ```python
-fig = go.Figure(data=
-    go.Scatterpolar(
-        r = [0.5,1,2,2.5,3,4],
-        theta = [35,70,120,155,205,240],
-        mode = 'markers',
-    ))
-fig
-```
-
-```python
 import numpy as np
-```
-
-```python
-np.linspace(90, 90-360, 5)
-```
-
-```python
-help(go.layout.Polar)
-```
-
-```python
-points
 ```
 
 ```python
@@ -67,4 +45,8 @@ app.layout = html.Div([
 
 # Run app and display result inline in the notebook
 app.run_server(mode='inline', debug=True, port = '8051', host='0.0.0.0')
+```
+
+```python
+
 ```

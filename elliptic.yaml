@@ -269,6 +269,12 @@ layout:
                         - dbc.Col:
                             width: 4
                             children:
+                            - dcc.Graph:
+                                id: multiply-clock
+                                mathjax: True
+                                config:
+                                  displayModeBar: False
+                                figure: ${empty_graph}
                             - html.Details:
                                 children:
                                 - html.Summary: Click to expand problem set
@@ -878,6 +884,27 @@ callbacks:
       - id: multiply-inverse-message
         attr: children
     callback: elliptic.dashboard.multiply_inverse_graph
+
+  multiply_inverse_clock:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: user-input-n
+        attr: value
+      - id: multiply-points
+        attr: data
+      - id: multiply-mode
+        attr: value
+      # - id: multiply-subgroup
+      #   attr: value
+    output:
+      - id: multiply-clock
+        attr: figure
+    callback: elliptic.dashboard.multiply_inverse_clock
 
   load_multiply_problems:
     input:

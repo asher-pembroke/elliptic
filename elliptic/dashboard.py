@@ -287,6 +287,136 @@ n_ = 13
 for k in [-3%n_, 3, 5, 7, 15]: # 0^-1 does not exist
     assert k*(modinv(k, n_)*G_) == G_
 
+def multiply_inverse_clock(p_i, a, b, n, points, mode, *args):
+    """render points around a clock"""
+
+    empty_graph = go.Figure(
+        data=[go.Scatterpolar(
+                    r=[],
+                    theta=[],
+                    text=[],
+                    marker_symbol='square',
+                    marker=dict(
+                        # size=get_p_size(p_i),
+                        color='mediumseagreen'),
+                    hoverinfo='skip',
+                    mode='markers',
+                    showlegend=False,
+                    )],
+        layout = dict(
+                polar = dict(
+                        hole=.75,
+                        radialaxis = dict(
+                            range=[0, 1.5],
+                            showticklabels=False,
+                            ticks='',
+                            showgrid=False),
+                        angularaxis = dict(
+                            showticklabels=False,
+                            showgrid=False,
+                            ticks='',
+                            visible=True),
+                        )
+        ))
+
+    if n is None:
+        raise PreventUpdate
+
+    error_msg = ''
+    ctx = dash.callback_context
+
+    active_tab = 'point-multiplication'
+
+    p = primes_[p_i]
+
+    curve = elliptic(p, a, b)
+
+    order_ = order(p, a, b)
+
+    logging.debug('multiply_inverse_clock:', p_i, a, b, n, points, mode, *args)
+    
+    if points is None:
+        return empty_graph
+    else:
+        fig = go.Figure(layout=dict(
+                margin=dict(l=5,r=5),
+                polar = dict(
+                        hole=.75,
+                        radialaxis = dict(
+                            range=[0, 1.5],
+                            showticklabels=False,
+                            ticks='',
+                            showgrid=False),
+                        angularaxis = dict(
+                            showgrid=False,
+                            ticks='',
+                            visible=True),
+                        )
+            ))
+
+        curve_key = str((p, a, b, mode))
+        if curve_key in points:
+            pts = points[curve_key]
+
+            rhs_str = ''
+
+            if len(pts) > 0:
+                x_0, y_0 = pts[0]
+                G_0 = point_in_curve(x_0, y_0, p, a, b)
+                subgroup_order_ = subgroup_order(G_0)
+                rotate = int(subgroup_order_/4)
+                theta_ = []
+                for i in range(subgroup_order_):
+                    x_ = []
+                    y_ = []
+
+                    P_i = i*G_0
+                    if P_i.x is not None:
+                        x_.append(P_i.x.num)
+                        y_.append(P_i.y.num)
+                        theta_.append(str((P_i.x.num, P_i.y.num)))
+
+                theta_.append('$\infty$')
+
+                theta_ = theta_[::-1] # reverse
+                theta_ = np.roll(theta_, rotate)
+
+                subgroup_trace = go.Scatterpolar(
+                    r=subgroup_order_*[1],
+                    theta=theta_,
+                    text=theta_,
+                    marker_symbol='square',
+                    marker=dict(
+                        # size=get_p_size(p_i),
+                        color='mediumseagreen'),
+                    hoverinfo='skip',
+                    mode='markers',
+                    showlegend=False,
+                    )
+                fig.add_trace(subgroup_trace)
+
+                if len(pts) == 2: # get second point
+                    if (2 in mode) & (n%subgroup_order_ == 0):
+                        pass
+                    else:
+                        x_n, y_n = pts[1]
+                        if x_n == -1:
+                            theta_n = '$\infty$'
+                        else:
+                            theta_n = str((x_n, y_n))
+                        n_point = go.Scatterpolar(
+                            r=[1],
+                            theta=[theta_n],
+                            text=[],
+                            marker_symbol='square',
+                            marker=dict(size=get_p_size(p_i)),
+                            hoverinfo='skip',
+                            mode='markers',
+                            showlegend=False)
+                        fig.add_trace(n_point)
+            else:
+                return empty_graph
+    return fig
 
 def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
     """multiply points by n"""
