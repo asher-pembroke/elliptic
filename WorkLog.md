@@ -1,3 +1,6 @@
+
+# 2022-07-02 10:47:31.815416: clock-in
+
 # 2022-07-01 19:13:29.037993: clock-out
 
 * developing angular plot
