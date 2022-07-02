@@ -1,3 +1,5 @@
+# 2022-07-02 15:11:06.166405: clock-out
+
 * lesson 4 - navigating elliptic curves
 * check ruben somsen's silent payments!
 https://gist.github.com/RubenSomsen/c43b79517e7cb701ebf77eec6dbb46b8?permalink_comment_id=4113680
