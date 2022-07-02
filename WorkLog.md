@@ -1,3 +1,5 @@
+# 2022-07-02 13:51:56.807471: clock-out: T-20m 
+
 * ecdsa scheme working
 * added corbellini visualization
 
