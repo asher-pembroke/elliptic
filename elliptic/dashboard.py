@@ -174,6 +174,11 @@ def multiply_graph(p_i, a, b, n, points, *args):
                 hoverinfo = 'text',
                 text = array_to_str(curve),
                 ),
+           layout=dict(paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                title=dict(font=dict(color='white')))
             )
 
     title_str = ''
@@ -247,7 +252,8 @@ def multiply_graph(p_i, a, b, n, points, *args):
     fig.update_layout(dict(
                 xaxis=dict(range=[0,p-1]),
                 yaxis=dict(range=[0,p-1]),
-                title="$ {} $".format(title_str)))
+                title=dict(font=dict(color='white'),
+                    text="$ {} $".format(title_str))))
 
     if active_tab == 'secret-sharing':
         fig.update_layout(width=600, height=600)
@@ -304,6 +310,8 @@ def multiply_inverse_clock(p_i, a, b, n, points, mode, *args):
                     showlegend=False,
                     )],
         layout = dict(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 polar = dict(
                         hole=.75,
                         radialaxis = dict(
@@ -314,6 +322,7 @@ def multiply_inverse_clock(p_i, a, b, n, points, mode, *args):
                         angularaxis = dict(
                             showticklabels=False,
                             showgrid=False,
+                            ticktext=['white'],
                             ticks='',
                             visible=True),
                         )
@@ -339,20 +348,27 @@ def multiply_inverse_clock(p_i, a, b, n, points, mode, *args):
         return empty_graph
     else:
         fig = go.Figure(layout=dict(
-                margin=dict(l=5,r=5),
+                margin=dict(l=0,r=0),
                 polar = dict(
                         hole=.75,
                         radialaxis = dict(
                             range=[0, 1.5],
                             showticklabels=False,
                             ticks='',
+                            color='white',
                             showgrid=False),
                         angularaxis = dict(
                             showgrid=False,
                             ticks='',
+                            color='white',
                             visible=True),
-                        )
-            ))
+                        ),
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                title=dict(font=dict(color='white')),
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)"))
+            
 
         curve_key = str((p, a, b, mode))
         if curve_key in points:
@@ -439,6 +455,11 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
                 hoverinfo = 'text',
                 text = array_to_str(curve),
                 ),
+           layout=dict(paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                title=dict(font=dict(color='white')))
             )
 
     title_str = ''
@@ -559,7 +580,8 @@ def multiply_inverse_graph(p_i, a, b, n, points, mode, show_subgroup):
                 width=400,
                 height=400,
                 # margin=dict(l=0,r=0),
-                title="$ {} $".format(title_str)))
+                title=dict(font=dict(color='white'),
+                    text="$ {} $".format(title_str))))
 
     if active_tab == 'secret-sharing':
         fig.update_layout(width=600, height=600)
@@ -600,6 +622,11 @@ def add_graph(p_i, a, b, points):
                 hoverinfo = 'text',
                 text = array_to_str(curve),
                 ),
+            layout=dict(paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                title=dict(font=dict(color='white')))
             )
 
     title_str = get_eqn_str(p, a, b)
@@ -652,7 +679,8 @@ def add_graph(p_i, a, b, points):
     fig.update_layout(dict(width=700, height=700,
                 xaxis=dict(range=[0,p-1]),
                 yaxis=dict(range=[0,p-1]),
-                title="$ {} $".format(title_str)))
+                title=dict(font=dict(color='white'),
+                    text="$ {} $".format(title_str))))
     return fig
 
 def update_multiply_inverse_points(p_i, a, b, n, clickData, mode, store):
