@@ -1,3 +1,4 @@
+* reading up on schnorr
 
 # 2022-10-10 05:56:33.982877: clock-in
 
