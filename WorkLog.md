@@ -1,3 +1,6 @@
+
+# 2022-10-10 07:12:18.180083: clock-in
+
 # 2022-10-10 06:27:05.487299: clock-out
 
 * reading up on schnorr
