@@ -151,10 +151,26 @@ Further reading:
 
 "
 
+sign_message: "## Signing
 
-verify_message: "## Verification
+To sign a message:
 
-To verify signature:
+* z = Hash of message (truncated)
+
+* choose $k \\in [1, n]$ for subgroup order $n$
+
+* calculate $P=kG$
+
+* r = P_x mod n # get x coordinate of P (unless $r=0$)
+
+* $s = k^{-1}(z+rd_A) modn$
+
+"
+
+
+verify_message: "## Verifying
+
+To verify a signature:
 
 * 𝑢1 = 𝑠−1 𝑧 modn
 
@@ -528,6 +544,9 @@ layout:
                         - dbc.Col:
                             width: 6
                             children:
+                            - dcc.Markdown:
+                                children: ${sign_message}
+                                mathjax: True
                             - dbc.Row:
                                 children:
                                 - dbc.Col:
@@ -572,11 +591,18 @@ layout:
                                         value: 10
                                         min: 1
                                 - dbc.Col:
-                                    width: 3
+                                    width: 2
                                     children:
                                     - dbc.Label: P_k
                                     - dcc.Markdown:
                                         id: sign-p-k
+                                        children: ''
+                                - dbc.Col:
+                                    width: 3
+                                    children:
+                                    - dbc.Label: (z,r,s)
+                                    - dcc.Markdown:
+                                        id: sign-z-r-s
                                         children: ''
                             - html.Div:
                                 id: pub-graph-sign-outer
@@ -613,8 +639,10 @@ layout:
                             width: 6
                             children:
                             - dcc.Markdown:
-                                id: sign-validate
                                 children: ${verify_message}
+                            - dcc.Markdown:
+                                id: sign-validate
+                                children: 'nothing yet'
                             - dcc.Graph:
                                 id: validate-graph
                                 mathjax: True
@@ -646,6 +674,7 @@ callbacks:
   #     - id: validate-points
   #       attr: data
   #   callback: elliptic.dashboard.update_add_points
+
 
   show_hide_sign_pub:
     input:
@@ -846,23 +875,28 @@ callbacks:
     output:
       - id: sign-params
         attr: children
+      - id: sign-z-r-s
+        attr: children
     callback: elliptic.dashboard.render_sign_params
 
-
-  # update_validate_graph:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: validate-points
-  #       attr: data
-  #   output:
-  #     - id: validate-graph
-  #       attr: figure
-  #   callback: elliptic.dashboard.add_graph
+  validate_signature:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: sign-z-r-s
+        attr: children
+      - id: sign-pub
+        attr: data
+      - id: sign-pub-key
+        attr: children
+    output:
+      - id: sign-validate
+        attr: children
+    callback: elliptic.dashboard.validate_signature
 
 
 
@@ -934,27 +968,6 @@ callbacks:
       - id: multiply-problem-set
         attr: children
     callback: elliptic.dashboard.load_multiply_problems
-
-  # @app.callback(
-  #     Output({'type': 'dynamic-output', 'index': MATCH}, 'children'),
-  #     Input({'type': 'dynamic-dropdown', 'index': MATCH}, 'value'),
-  #     State({'type': 'dynamic-dropdown', 'index': MATCH}, 'id'),
-  # )
-  # def display_output(value, id):
-  #     return html.Div('Dropdown {} = {}'.format(id['index'], value))
-
-  # render_user_answer:
-  #   input:
-  #     - id:
-  #         kind: point-multiplication
-  #         index: MATCH
-  #       attr: value
-  #   output:
-  #     - id:
-  #         kind: point-multiplication-render
-  #         index: MATCH
-  #       attr: children
-  #   callback: elliptic.dashboard.render_user_answer
 
   validate_user_answer:
     input:

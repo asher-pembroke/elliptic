@@ -815,8 +815,9 @@ def render_pub_key(p_i, a, b, points):
         if curve_key in points:
             if len(points[curve_key]) == 2:
                 pubkey = points[curve_key][-1]
-                points_str = '**({},{})**'.format(*pubkey)
+                points_str = '**({}, {})**'.format(*pubkey)
     return points_str
+
 
 def render_points(p_i, a, b, points):
     p = primes_[p_i]
@@ -987,31 +988,41 @@ def get_s(k, z, r, d_a, n):
     k_inv = modinv(k, n)
     return (k_inv*((z%n + (r*d_a)%n)%n))%n
 
+def validate_signature(p_i, a, b, z_r_s, pub_points, pub_key):
+    p = primes_[p_i]
+
+    curve_key = str((p,a,b))
+
+    pub_points = pub_points[curve_key]
+    G_0 = tuple(pub_points[0])
+
+    return z_r_s, G_0, pub_key
+
 def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, message):
     p = primes_[p_i]
 
     curve_key = str((p,a,b))
 
     if curve_key not in pub_points:
-        return "Must supply private key"
+        return "Must supply private key", ''
     if curve_key not in secret_points:
-        return "Must choose secret key k"
+        return "Must choose secret key k", ''
 
     pub_points = pub_points[curve_key]
     secret_points = secret_points[curve_key]
 
     if len(pub_points) == 0:
-        return "Must choose public key"
+        return "Must choose public key", ''
 
     if len(secret_points) == 0:
-        return "Must choose secret key"
+        return "Must choose secret key", ''
 
 
     G_0 = tuple(pub_points[0])
     K_0 = tuple(secret_points[0])
 
     if G_0 != K_0:
-        return "Generator point for ${}$ does not match Secret Key ${}$, please try again.".format(G_0, K_0)
+        return "Generator point for ${}$ does not match Secret Key ${}$, please try again.".format(G_0, K_0), ''
 
     x_0, y_0 = secret_points[0]
     subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
@@ -1019,13 +1030,13 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     try:
         r = modinv(secret_points[-1][0], subgroup_order_)
     except:
-        return 'could not compute prime inverse for {}'.format(subgroup_order_)
+        return 'could not compute prime inverse for {}'.format(subgroup_order_), ''
 
     if r == 0:
-        return "$P_{kx}$ = 0! please choose another (random) k!"
+        return "$P_{kx}$ = 0! please choose another (random) k!", ''
 
     if message is None:
-        return "Message required to proceed."
+        return "Message required to proceed.", ''
 
     z_size = 2
     n = int.from_bytes((subgroup_order_).to_bytes(2, 'big'),'big')
@@ -1033,9 +1044,9 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
 
     try:
         # return f'modinv({k},{n})={modinv(k,n)}'
-        modinv(k,n)
+        modinv(k, n)
     except:
-        return f'cannot compute modinv({k},{n})'
+        return f'cannot compute modinv({k},{n})', ''
 
     s = get_s(k, z, r, priv_key, n)
 
@@ -1044,21 +1055,21 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     message_ += f"({k})^(-1)({z}+{r}({priv_key})) mod {n} = "
     message_ += str(s)
 
-    message_ += f'\n\n Signature: (r, s) = ({r}, {s})'
+    message_ += f'\n\n Signature: (z, r, s) = ({z}, {r}, {s})'
 
-    return message_
+    return message_, f'**({z},{r},{s})**'
 
     if message is None:
         message = ''
 
     return_msg = "pub_points: {}".format(str(pub_points))
     return_msg += "secret_points: {}".format(str(secret_points))
-    return return_msg
+    return return_msg, ''
 
     # return str(secret_points)
     # subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
     return_msg = message.format(pub_key)
-    return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n"
+    return f"priv key: {priv_key}\nk:{k}\nmessage:{message}\np:{p}\n", ''
 
 
 def input_type(kind, id_, type_):
