@@ -1,3 +1,4 @@
+* verify
 * formatting for slate
 
 # 2022-10-10 07:12:18.180083: clock-in

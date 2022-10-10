@@ -151,6 +151,19 @@ Further reading:
 
 "
 
+
+verify_message: "## Verification
+
+To verify signature:
+
+* 𝑢1 = 𝑠−1 𝑧 modn
+
+* 𝑢2 = 𝑠−1 𝑟 modn
+
+* 𝑃 = 𝑢1 𝐺 + 𝑢2 𝐻𝑎
+
+"
+
 layout:
   dbc.Container:
     children:
@@ -498,7 +511,7 @@ layout:
                                                     color: success
         - dbc.Tab:
             tab_id: signatures
-            label: Signatures
+            label: Signatures (ECDSA)
             children:
             - dcc.Store:
                 id: sign-pub
@@ -574,6 +587,9 @@ layout:
                                     config:
                                       displayModeBar: False
                                     figure: ${empty_graph}
+                            - dcc.Markdown:
+                                id: sign-params
+                                mathjax: True
                             - html.Div:
                                 id: k-graph-sign-outer
                                 children:
@@ -593,18 +609,18 @@ layout:
                                     placeholder: Enter message to sign
                                     style:
                                       height: 80
-                                - dcc.Markdown:
-                                    id: sign-params
-                                    mathjax: True
                         - dbc.Col:
                             width: 6
                             children:
-                              # dcc.Graph:
-                              #   id: validate-graph
-                              #   mathjax: True
-                              #   config:
-                              #     displayModeBar: False
-                              #   figure: ${empty_graph}
+                            - dcc.Markdown:
+                                id: sign-validate
+                                children: ${verify_message}
+                            - dcc.Graph:
+                                id: validate-graph
+                                mathjax: True
+                                config:
+                                  displayModeBar: False
+                                figure: ${empty_graph}
         - dbc.Tab:
             tab_id: references
             label: References

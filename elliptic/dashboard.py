@@ -1032,7 +1032,8 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     z = get_z(message, z_size)
 
     try:
-        return f'modinv({k},{n})={modinv(k,n)}'
+        # return f'modinv({k},{n})={modinv(k,n)}'
+        modinv(k,n)
     except:
         return f'cannot compute modinv({k},{n})'
 
@@ -1043,7 +1044,7 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
     message_ += f"({k})^(-1)({z}+{r}({priv_key})) mod {n} = "
     message_ += str(s)
 
-    message_ += f'\n\n Signature: ({r}, {s})'
+    message_ += f'\n\n Signature: (r, s) = ({r}, {s})'
 
     return message_
 
