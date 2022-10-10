@@ -1,3 +1,6 @@
+
+# 2022-10-10 05:56:33.982877: clock-in
+
 # 2022-07-02 15:11:06.166405: clock-out
 
 * lesson 4 - navigating elliptic curves
