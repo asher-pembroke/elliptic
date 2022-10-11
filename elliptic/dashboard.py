@@ -988,15 +988,39 @@ def get_s(k, z, r, d_a, n):
     k_inv = modinv(k, n)
     return (k_inv*((z%n + (r*d_a)%n)%n))%n
 
-def validate_signature(p_i, a, b, z_r_s, pub_points, pub_key):
+def md_str_to_tuple(md_str):
+    """convert a markdown string like **(1,2,3)** to integers"""
+    if len(md_str) == 0:
+        return
+
+    md_str = md_str.strip('**').strip('()')
+
+    if md_str.count(',') > 0:
+        return [int(_) for _ in  md_str.split(',')]
+    else:
+        return int(md_str)
+
+
+def validate_signature(p_i, a, b, z_r_s, gen_points, pub_key_str):
     p = primes_[p_i]
 
     curve_key = str((p,a,b))
 
-    pub_points = pub_points[curve_key]
-    G_0 = tuple(pub_points[0])
+    gen_points = gen_points[curve_key]
+    
+    if len(gen_points) == 0:
+        raise PreventUpdate
 
-    return z_r_s, G_0, pub_key
+
+    G_0 = tuple(gen_points[0])
+
+
+    if len(z_r_s) > 0:
+        z, r, s = md_str_to_tuple(z_r_s)
+    else:
+        z, r, s = '', '', ''
+
+    return str((z,r,s)), str(G_0), pub_key_str
 
 def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, message):
     p = primes_[p_i]
