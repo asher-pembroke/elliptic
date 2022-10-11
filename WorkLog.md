@@ -1,3 +1,5 @@
+# 2022-10-10 21:06:25.956778: clock-out
+
 * parsing out signature
 
 # 2022-10-10 20:35:46.642383: clock-in
