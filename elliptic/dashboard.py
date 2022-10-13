@@ -277,8 +277,8 @@ def modinv(a, m):
     if not is_prime(m):
         raise ValueError('{} is not prime!'.format(m))
     g, x, y = extended_gcd(a, m)
-    if g != 1:
-        raise ValueError
+    if g%m != 1:
+        raise ValueError(f'{g%m} != 1')
     return x % m
 
 G_ = Point(x=FieldElement(18, 37),
@@ -1000,6 +1000,17 @@ def md_str_to_tuple(md_str):
     else:
         return int(md_str)
 
+verify_message = """## Verifying
+
+To verify a signature:
+
+u_1 = s^-1 z mod_n = {u_1}
+
+u_2 = 𝑠^-11 r mod_n = {u_2}
+
+𝑃 = u_1 𝐺 + u_2 H_A = {u_1}*{G_0} + {u_2}*{H_A} = {P} VERIFIED!
+"""
+
 
 def validate_signature(p_i, a, b, z_r_s, gen_points, pub_key_str):
     p = primes_[p_i]
@@ -1014,13 +1025,38 @@ def validate_signature(p_i, a, b, z_r_s, gen_points, pub_key_str):
 
     G_0 = tuple(gen_points[0])
 
+    G_0 = point_in_curve(*G_0, p=p, a=a, b=b)
+
+    pub_key = md_str_to_tuple(pub_key_str)
+
+    H_A = point_in_curve(*pub_key, p=p, a=a, b=b)
+
 
     if len(z_r_s) > 0:
         z, r, s = md_str_to_tuple(z_r_s)
     else:
-        z, r, s = '', '', ''
+        raise PreventUpdate
 
-    return str((z,r,s)), str(G_0), pub_key_str
+    n_G0 = subgroup_order(G_0) # should be 37 for {'p': 29, 'a': -1, 'b': 1}
+    n_G0
+
+    try:
+        u_1 = (modinv(s, n_G0)*z)%n_G0
+        u_1
+
+        u_2 = (modinv(s, n_G0)*r)%n_G0
+        u_2
+    except ValueError as m:
+        raise PreventUpdate
+
+    P = u_1*G_0+u_2*H_A
+
+    return verify_message.format(
+        u_1=u_1,
+        u_2=u_2,
+        G_0 = tuple([G_0.x.num, G_0.y.num]),
+        H_A = tuple([H_A.x.num, H_A.y.num]),
+        P=tuple([P.x.num, P.y.num]))
 
 def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, message):
     p = primes_[p_i]

@@ -639,10 +639,12 @@ layout:
                             width: 6
                             children:
                             - dcc.Markdown:
-                                children: ${verify_message}
-                            - dcc.Markdown:
                                 id: sign-validate
-                                children: 'nothing yet'
+                                children: ${verify_message}
+                                mathjax: True
+                            # - dcc.Markdown:
+                            #     id: sign-validate
+                            #     children: 'nothing yet'
                             - dcc.Graph:
                                 id: validate-graph
                                 mathjax: True
