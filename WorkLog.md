@@ -1,3 +1,5 @@
+# 2022-11-05 15:41:53.229458: clock-out
+
 * tutorial for Timechain Academy
 
 # 2022-11-05 15:41:37.372620: clock-in: T-1h40m 
