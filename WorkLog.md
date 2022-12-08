@@ -1,3 +1,6 @@
+
+# 2022-12-08 10:01:49.563627: clock-in
+
 # 2022-11-05 15:41:53.229458: clock-out
 
 * tutorial for Timechain Academy
