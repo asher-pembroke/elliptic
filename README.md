@@ -8,6 +8,14 @@ The continuous case uses geogebra. Visit the interactive companion page here:
 
 https://www.geogebra.org/m/baurc6bu
 
+### Lesson 1 - discrete elliptic curves
+
+The discrete case uses an interactive dashboard developed for this course. 
+
+Visit the following site to run it in your browser http://137.184.28.205:8050/
+
+Alternatively, you may run it locally by following the Setup instructions below.
+
 <!-- #region -->
 ## Setup
 
