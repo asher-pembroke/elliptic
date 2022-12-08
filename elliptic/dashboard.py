@@ -342,7 +342,7 @@ def multiply_inverse_clock(p_i, a, b, n, points, mode, *args):
 
     order_ = order(p, a, b)
 
-    logging.debug('multiply_inverse_clock:', p_i, a, b, n, points, mode, *args)
+    # logging.debug('multiply_inverse_clock:', p_i, a, b, n, points, mode, *args)
     
     if points is None:
         return empty_graph
