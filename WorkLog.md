@@ -1,3 +1,4 @@
+* setting up digital ocean
 
 # 2022-12-08 10:01:49.563627: clock-in
 
