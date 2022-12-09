@@ -201,7 +201,7 @@ Signature: (R, s)
 
 "
 
-verify_message_schnorr: "## Verifying
+verify_message_schnorr: "## Validating
 
 To verify a signature:
 
@@ -689,24 +689,177 @@ layout:
             tab_id: signatures-schnorr
             label: Signatures (Schnorr)
             children:
+            - dcc.Store:
+                id: schnorr-pub
+            - dcc.Store:
+                id: secret-schnorr-store
             - dbc.Card:
                 body: True
                 children:
-                    - dbc.Row:
+                - dbc.Row:
+                    children:
+                    - dbc.Col:
                         children:
-                        - dbc.Col:
+                        - dcc.Markdown:
+                            children: ${sign_message_schnorr}
+                            mathjax: True
+                    - dbc.Col:
+                        children:
+                        - dcc.Markdown:
+                            children: ${verify_message_schnorr}
+                            mathjax: True
+                - dbc.Row:
+                    children:
+                    - dbc.Col:
+                        width: 1
+                        children:
+                        - dbc.Label:
                             children:
                             - dcc.Markdown:
-                                children: ${sign_message_schnorr}
+                                children: $d_k$
                                 mathjax: True
+                        - dbc.Input:
+                            id: alice-priv-schnorr
+                            type: number
+                            step: 1
+                            value: 3
+                            min: 1
 
-                        - dbc.Col:
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children: 
+                            - dcc.Markdown:
+                                children: $H_A$
+                                mathjax: True
+                        - dcc.Markdown:
+                            id: alice-pub-schnorr
+                            mathjax: True
+
+                    - dbc.Col:
+                        width: 1
+                        children:
+                        - dbc.Label:
                             children:
                             - dcc.Markdown:
-                                children: ${verify_message_schnorr}
+                                children: $k$
                                 mathjax: True
-                                
+                        - dbc.Input:
+                            id: secret-schnorr
+                            type: number
+                            step: 1
+                            value: 5
+                            min: 1
 
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children:
+                            - dcc.Markdown:
+                                children: $R$
+                                mathjax: True
+                        - dcc.Markdown:
+                            id: secret-schnorr-render
+                            mathjax: True
+
+                    - dbc.Col:
+                        width: 3
+                        children:
+                        - dbc.Label:
+                            children: 
+                            - dcc.Markdown: message
+                        - dbc.Input:
+                            id: schnorr-message
+                            type: text
+                            value: btc++ is the best!
+                - html.Br:
+                - dbc.Row:
+                    children:
+                    - dbc.Col:
+                        width: 3
+                        children:
+                        - dbc.Label:
+                            children:
+                                dcc.Markdown:
+                                    children: concat $R||H_A||m$
+                                    mathjax: True
+                        - dcc.Markdown:
+                            id: concat
+                            mathjax: True
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children:
+                                dcc.Markdown:
+                                    children: $Hash(R||H_A||m) mod_n$
+                                    mathjax: True
+                        - dbc.Input:
+                            id: hash-concat
+                            type: number
+                            step: 1
+                            min: 1
+                            disabled: True
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children:
+                                dcc.Markdown:
+                                    children: $s = (k + h*(d_A)) mod_n$
+                                    mathjax: True
+                        - dbc.Input:
+                            id: schnorr-s
+                            type: number
+                            step: 1
+                            min: 1
+                            disabled: True
+
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children:
+                                dcc.Markdown:
+                                    children: "signature:"
+                                    mathjax: True
+                        - dcc.Markdown:
+                            id: signatures-schnorr-render
+                            mathjax: True
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children:
+                                dcc.Markdown:
+                                    children: "validation:"
+                                    mathjax: True
+                        - dcc.Markdown:
+                            id: signatures-schnorr-validate
+                            mathjax: True
+
+                - dbc.Row:
+                    children:
+                    - dbc.Col:
+                        width: 6
+                        children:
+                        - dcc.Graph:
+                            id: private-key-schnorr
+                            mathjax: True
+                            config:
+                              displayModeBar: False
+                            figure: ${empty_graph}
+                    - dbc.Col:
+                        width: 6
+                        children:
+                        - dcc.Graph:
+                            id: secret-key-schnorr
+                            mathjax: True
+                            config:
+                              displayModeBar: False
+                            figure: ${empty_graph}
 
         - dbc.Tab:
             tab_id: references
@@ -714,7 +867,7 @@ layout:
             children:
             - dcc.Markdown:
                 children: ${references}
-                            }
+
 
 callbacks:
   # update_validate_points:
@@ -1484,4 +1637,169 @@ callbacks:
         attr: color
     callback: elliptic.dashboard.update_crypto_buttons
 
+### schnorr
+  schnorr_graph_alice:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv-schnorr
+        attr: value
+      - id: schnorr-pub
+        attr: data
+      # - id: sharing-mode
+      #   attr: value
+    output:
+      - id: private-key-schnorr
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
 
+  schnorr_graph_secret:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: secret-schnorr
+        attr: value
+      - id: secret-schnorr-store
+        attr: data
+      # - id: sharing-mode
+      #   attr: value
+    output:
+      - id: secret-key-schnorr
+        attr: figure
+    callback: elliptic.dashboard.multiply_graph
+
+  update_alice_pub_schnorr:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: alice-priv-schnorr
+        attr: value
+      - id: private-key-schnorr
+        attr: clickData
+    state:
+      - id: schnorr-pub
+        attr: data
+    output:
+      - id: schnorr-pub
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  update_alice_secret_schnorr:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: secret-schnorr
+        attr: value
+      - id: secret-key-schnorr
+        attr: clickData
+    state:
+      - id: secret-schnorr-store
+        attr: data
+    output:
+      - id: secret-schnorr-store
+        attr: data
+    callback: elliptic.dashboard.update_multiply_points
+
+  render_alice_pub_schnorr:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: schnorr-pub
+        attr: data
+    output:
+      - id: alice-pub-schnorr
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+
+  render_alice_secret_schnorr:
+    input:
+      - id: user-input-p
+        attr: value
+      - id: user-input-a
+        attr: value
+      - id: user-input-b
+        attr: value
+      - id: secret-schnorr-store
+        attr: data
+    output:
+      - id: secret-schnorr-render
+        attr: children
+    callback: elliptic.dashboard.render_pub_key
+
+  concatonate:
+    input:
+      - id: alice-pub-schnorr
+        attr: children
+      - id: secret-schnorr-render
+        attr: children
+      - id: schnorr-message
+        attr: value
+    output:
+      - id: concat
+        attr: children
+    callback: elliptic.dashboard.cat
+
+
+# hash_concat(p_i, a, b, pub_points, message)
+  hash_concat:
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: schnorr-pub
+      attr: data
+    - id: secret-schnorr-store
+      attr: data
+    - id: concat
+      attr: children
+    - id: alice-priv-schnorr
+      attr: value
+    - id: secret-schnorr
+      attr: value
+    output:
+    - id: hash-concat
+      attr: value
+    - id: schnorr-s
+      attr: value
+    - id: signatures-schnorr-validate
+      attr: children
+    callback: elliptic.dashboard.hash_concat
+
+
+
+  render_signature_schnorr:
+    input:
+    - id: schnorr-s
+      attr: value
+    - id: secret-schnorr-render
+      attr: children
+    output:
+    - id: signatures-schnorr-render
+      attr: children
+
+    callback: elliptic.dashboard.render_signature_schnorr
+  

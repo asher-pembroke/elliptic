@@ -1193,3 +1193,66 @@ def validate_user_answer(answer):
     return valid, invalid, message
 
 
+def cat(pub_key, secret_r, message):
+    """concatonate all str arguments"""
+    print(pub_key, secret_r, message)
+    for _ in [pub_key, secret_r, message]:
+        if len(_) == 0:
+            raise PreventUpdate
+    return ''.join([pub_key.strip('**'), secret_r.strip('**'), message])
+
+
+def hash_concat(p_i, a, b, pub_points, secret_points, message, d_a, k):
+    p = primes_[p_i]
+
+    curve_key = str((p,a,b))
+
+    if curve_key not in pub_points:
+        raise PreventUpdate
+
+    pub_points = pub_points[curve_key]
+
+    if len(pub_points) == 0:
+        raise PreventUpdate
+
+    G_0 = tuple(pub_points[0])
+
+
+    if curve_key not in secret_points:
+        raise PreventUpdate
+    
+    secret_points = secret_points[curve_key]
+    
+    if len(secret_points) == 0:
+        raise PreventUpdate
+    R = tuple(secret_points[0])
+    
+
+
+    x_0, y_0 = pub_points[0]
+    subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
+
+    h = get_z(message)%subgroup_order_
+
+    s = (k%subgroup_order_ + (h%subgroup_order_)*(d_a%subgroup_order_))%subgroup_order_
+
+    G = point_in_curve(G_0[0], G_0[1], p, a, b)
+    sG = s*G
+
+    Rp = point_in_curve(R[0], R[1], p, a, b)
+    H_A = d_A*H_A
+    # V = Rp + *H_A
+    # validate = f'${s} \\cdot {G_0} = {sG.x.num, sG.y.num} = {R} + {h} \\cdot {H_A} = ({V.x.num}, {V.y.num})$'
+    # validate = f'${s} \\cdot {G_0} = {sG.x.num, sG.y.num}$' + f"= {V.x.num}, {V.y.num}"
+
+    return h, s, 'valid?'
+
+
+def render_signature_schnorr(s,R):
+    if s is None:
+        raise PreventUpdate
+
+    renderable_sig = f'    ({s}, {R})'
+
+    return renderable_sig
+
