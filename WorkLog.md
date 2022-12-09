@@ -1,3 +1,6 @@
+
+# 2022-12-09 07:50:31.509732: clock-in
+
 # 2022-12-09 01:42:29.205186: clock-out
 
 * got schnorr signatures working
