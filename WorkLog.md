@@ -1,3 +1,5 @@
+# 2022-12-09 12:45:42.618760: clock-out
+
 * BTC++ talk
 * validating schnorr
 
