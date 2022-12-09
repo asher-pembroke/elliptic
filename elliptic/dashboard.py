@@ -1135,6 +1135,8 @@ def render_sign_params(p_i, a, b, priv_key, k, pub_points, secret_points, messag
 def input_type(kind, id_, type_):
     if type_ == 'int':
         return dbc.Input(id=dict(kind=kind, index=id_), type='number', step=1)
+    elif type_ == 'str':
+        return dbc.Input(id=dict(kind=kind, index=id_), type='text', placeholder='(x,y)')
     return html.Div()
 
 
@@ -1145,10 +1147,10 @@ def load_multiply_problems(url):
     for i, problem in enumerate(problems['point-multiplication']):
         problem_set.append(dcc.Markdown(children=problem['question']))
         problem_set.append(
-            dbc.Row(children=[
+            dbc.Row(justify="center", children=[
                 dbc.Col(children=[input_type('point-multiplication', i, problem['type'])]),
                 dbc.Col(children=[html.Div(id=dict(kind='point-multiplication-render', index=i))])
-                ])
+                ],)
             )
         
     return problem_set
@@ -1179,7 +1181,7 @@ def validate_user_answer(answer):
     problem = problems[problem_set][problem_index]
 
     z30 = get_z(answer, 30)
-    logging.debug(answer, z30, problem['answer_z30'])
+    # logging.debug(answer, z30, problem['answer_z30'])
 
     valid = problem['answer_z30'] == z30
     invalid = not valid

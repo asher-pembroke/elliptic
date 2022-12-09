@@ -120,7 +120,7 @@ An interactive primer on finite elliptic curves. Continuous elliptic curves [her
 
 subtitle: "
 
-Asher Pembroke @ TABCONF, Oct 13, 2022
+Asher Pembroke @ BTC++, Dec 9, 2022
 
 "
 
@@ -151,7 +151,7 @@ Further reading:
 
 "
 
-sign_message: "## Signing
+sign_message_ecdsa: "## Signing
 
 To sign a message:
 
@@ -159,7 +159,7 @@ To sign a message:
 
 * choose $k \\in [1, n]$ for subgroup order $n$
 
-* calculate $P=kG$
+* calculate $P=k \\cdot G$ and $H_A=d_A \\cdot G$
 
 * r = P_x mod n # get x coordinate of P (unless $r=0$)
 
@@ -168,7 +168,7 @@ To sign a message:
 "
 
 
-verify_message: "## Verifying
+verify_message_ecdsa: "## Verifying
 
 To verify a signature:
 
@@ -177,6 +177,37 @@ To verify a signature:
 * 𝑢2 = 𝑠−1 𝑟 modn
 
 * 𝑃 = 𝑢1 𝐺 + 𝑢2 𝐻𝑎
+
+"
+
+sign_message_schnorr: "## Signing
+
+To sign a message:
+
+* choose pub, priv key pair $H_A = d_A \\cdot G_0$
+
+* choose random, unused $k \\in [1, n]$ (for subgroup order $n$)
+
+* calculate $R=k\\cdot G_0$
+
+* concatonate $R||H_A||m$ for a message $m$
+
+* h = $Hash(R||H_A||m) mod_n$
+
+* compute $s = (k + h*(d_A)) mod_n$
+
+
+Signature: (R, s)
+
+"
+
+verify_message_schnorr: "## Verifying
+
+To verify a signature:
+
+* check that $s \\cdot G_0 = R + h \\cdot P$
+
+* done!
 
 "
 
@@ -214,7 +245,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: signatures #point-multiplication
+        active_tab: signatures-schnorr #point-multiplication
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -303,15 +334,18 @@ layout:
                         - dbc.Col:
                             width: 4
                             children:
-                            - dcc.Graph:
-                                id: multiply-clock
-                                mathjax: True
-                                config:
-                                  displayModeBar: False
-                                figure: ${empty_graph}
                             - html.Details:
                                 children:
-                                - html.Summary: Click to expand problem set
+                                - html.Summary: Click to reveal clock
+                                - dcc.Graph:
+                                    id: multiply-clock
+                                    mathjax: True
+                                    config:
+                                      displayModeBar: False
+                                    figure: ${empty_graph}
+                            - html.Details:
+                                children:
+                                - html.Summary: Click to expand problem set (Test your might!)
                                 - html.Div:
                                     id: multiply-problem-set
         - dbc.Tab:
@@ -526,7 +560,7 @@ layout:
                                                     children: Send
                                                     color: success
         - dbc.Tab:
-            tab_id: signatures
+            tab_id: signatures-ecdsa
             label: Signatures (ECDSA)
             children:
             - dcc.Store:
@@ -545,7 +579,7 @@ layout:
                             width: 6
                             children:
                             - dcc.Markdown:
-                                children: ${sign_message}
+                                children: ${sign_message_ecdsa}
                                 mathjax: True
                             - dbc.Row:
                                 children:
@@ -640,7 +674,7 @@ layout:
                             children:
                             - dcc.Markdown:
                                 id: sign-validate
-                                children: ${verify_message}
+                                children: ${verify_message_ecdsa}
                                 mathjax: True
                             # - dcc.Markdown:
                             #     id: sign-validate
@@ -652,11 +686,35 @@ layout:
                                   displayModeBar: False
                                 figure: ${empty_graph}
         - dbc.Tab:
+            tab_id: signatures-schnorr
+            label: Signatures (Schnorr)
+            children:
+            - dbc.Card:
+                body: True
+                children:
+                    - dbc.Row:
+                        children:
+                        - dbc.Col:
+                            children:
+                            - dcc.Markdown:
+                                children: ${sign_message_schnorr}
+                                mathjax: True
+
+                        - dbc.Col:
+                            children:
+                            - dcc.Markdown:
+                                children: ${verify_message_schnorr}
+                                mathjax: True
+                                
+
+
+        - dbc.Tab:
             tab_id: references
             label: References
             children:
             - dcc.Markdown:
                 children: ${references}
+                            }
 
 callbacks:
   # update_validate_points:

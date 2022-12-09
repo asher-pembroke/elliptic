@@ -26,3 +26,12 @@ point-multiplication:
     "
     answer_z30: 1528029186047959948733631850005999857860542493275095102440163969123032744
     type: int
+
+  - question: "4. For the elliptic curve defined by `a=0, b=7,` embedded in the finite field `p=37` and assuming the generator point `(18,20)`
+
+    if $$ 2 \\cdot (18, 20) = (8, 1) $$
+    and $$ 3 \\cdot (18, 20) = (32, 20) $$
+    then $$ 2 \\cdot (3 \\cdot (18, 20)) = 3 \\cdot (2 \\cdot (18, 20)) = ? $$
+    "
+    answer_z30: 292984823107728754659430152441712159308932464457216974734416267219075429
+    type: str

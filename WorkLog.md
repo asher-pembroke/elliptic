@@ -1,7 +1,11 @@
+* got schnorr signatures working
+To keep running in background
+`nohup python -u main.py > deploy.log 2> deploy.err < /dev/null &`
 
 # 2022-12-08 23:28:59.017745: clock-in: T-5m 
 
 * linking to online version
+
 # 2022-12-08 15:48:53.669519: clock-out
 
 * silencing errors
@@ -26,6 +30,7 @@
 # 2022-10-13 11:19:23.836412: clock-in: T-45m 
 
 * signatures
+
 # 2022-10-10 21:06:25.956778: clock-out
 
 * parsing out signature
