@@ -1,3 +1,5 @@
+# 2022-12-09 01:42:29.205186: clock-out
+
 * got schnorr signatures working
 To keep running in background
 `nohup python -u main.py > deploy.log 2> deploy.err < /dev/null &`
