@@ -1,3 +1,4 @@
+* BTC++ talk
 * validating schnorr
 
 # 2022-12-09 07:50:31.509732: clock-in
