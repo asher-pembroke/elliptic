@@ -1,3 +1,6 @@
+
+# 2022-12-10 14:20:46.670334: clock-in
+
 # 2022-12-10 12:41:19.749077: clock-out
 
 * validation working somewhat
