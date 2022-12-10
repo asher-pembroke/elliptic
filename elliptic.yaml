@@ -245,7 +245,7 @@ layout:
     - html.Br:
     - dbc.Tabs:
         id: lesson
-        active_tab: signatures-schnorr #point-multiplication
+        active_tab: point-addition
         children:
         - dbc.Tab:
             tab_id: point-addition
@@ -708,15 +708,29 @@ layout:
                         - dcc.Markdown:
                             children: ${verify_message_schnorr}
                             mathjax: True
+            - dbc.Card:
+                body: True
+                children:
                 - dbc.Row:
                     children:
+                    - dbc.Col:
+                        width: 2
+                        children:
+                        - dbc.Label:
+                            children: 
+                            - dcc.Markdown:
+                                children: $G_0$
+                                mathjax: True
+                        - dcc.Markdown:
+                            id: generator-point-schnorr
+                            mathjax: True
                     - dbc.Col:
                         width: 1
                         children:
                         - dbc.Label:
                             children:
                             - dcc.Markdown:
-                                children: $d_k$
+                                children: $d_A$
                                 mathjax: True
                         - dbc.Input:
                             id: alice-priv-schnorr
@@ -794,7 +808,7 @@ layout:
                         - dbc.Label:
                             children:
                                 dcc.Markdown:
-                                    children: $Hash(R||H_A||m) mod_n$
+                                    children: $Hash(R||H_A||m)_n$
                                     mathjax: True
                         - dbc.Input:
                             id: hash-concat
@@ -802,13 +816,16 @@ layout:
                             step: 1
                             min: 1
                             disabled: True
+                            style:
+                                width: 75
+                                height: 40
                     - dbc.Col:
                         width: 2
                         children:
                         - dbc.Label:
                             children:
                                 dcc.Markdown:
-                                    children: $s = (k + h*(d_A)) mod_n$
+                                    children: $s = (k + h*(d_A))_n$
                                     mathjax: True
                         - dbc.Input:
                             id: schnorr-s
@@ -816,6 +833,9 @@ layout:
                             step: 1
                             min: 1
                             disabled: True
+                            style:
+                                width: 75
+                                height: 40
 
                     - dbc.Col:
                         width: 2
@@ -828,38 +848,32 @@ layout:
                         - dcc.Markdown:
                             id: signatures-schnorr-render
                             mathjax: True
+            - dbc.Card:
+                body: True
+                children:
+                - dbc.Row:
+                    justify: center
+                    children:
+                    - dbc.Col:
+                        width: 6
+                        children:
+                        - dcc.Graph:
+                            id: schnorr-graph
+                            mathjax: True
+                            config:
+                              displayModeBar: False
+                            figure: ${empty_graph}
                     - dbc.Col:
                         width: 2
                         children:
                         - dbc.Label:
                             children:
                                 dcc.Markdown:
-                                    children: "validation:"
+                                    children: "validation: $s \\cdot G_0 = R + h \\cdot H_A$"
                                     mathjax: True
                         - dcc.Markdown:
                             id: signatures-schnorr-validate
                             mathjax: True
-
-                - dbc.Row:
-                    children:
-                    - dbc.Col:
-                        width: 6
-                        children:
-                        - dcc.Graph:
-                            id: private-key-schnorr
-                            mathjax: True
-                            config:
-                              displayModeBar: False
-                            figure: ${empty_graph}
-                    - dbc.Col:
-                        width: 6
-                        children:
-                        - dcc.Graph:
-                            id: secret-key-schnorr
-                            mathjax: True
-                            config:
-                              displayModeBar: False
-                            figure: ${empty_graph}
 
         - dbc.Tab:
             tab_id: references
@@ -1652,31 +1666,11 @@ callbacks:
         attr: data
       - id: secret-schnorr
         attr: value
-      # - id: secret-schnorr-store
-      #   attr: data
     output:
-      - id: private-key-schnorr
+      - id: schnorr-graph
         attr: figure
     callback: elliptic.dashboard.schnorr_graph_sign
 
-  # schnorr_graph_secret:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: secret-schnorr
-  #       attr: value
-  #     - id: secret-schnorr-store
-  #       attr: data
-  #     # - id: sharing-mode
-  #     #   attr: value
-  #   output:
-  #     - id: secret-key-schnorr
-  #       attr: figure
-  #   callback: elliptic.dashboard.multiply_graph
 
   update_alice_pub_schnorr:
     input:
@@ -1690,7 +1684,7 @@ callbacks:
         attr: value
       - id: secret-schnorr
         attr: value
-      - id: private-key-schnorr
+      - id: schnorr-graph
         attr: clickData
     state:
       - id: schnorr-pub
@@ -1700,25 +1694,6 @@ callbacks:
         attr: data
     callback: elliptic.dashboard.update_schnorr_points
 
-  # update_alice_secret_schnorr:
-  #   input:
-  #     - id: user-input-p
-  #       attr: value
-  #     - id: user-input-a
-  #       attr: value
-  #     - id: user-input-b
-  #       attr: value
-  #     - id: secret-schnorr
-  #       attr: value
-  #     - id: secret-key-schnorr
-  #       attr: clickData
-  #   state:
-  #     - id: secret-schnorr-store
-  #       attr: data
-  #   output:
-  #     - id: secret-schnorr-store
-  #       attr: data
-  #   callback: elliptic.dashboard.update_multiply_points
 
   render_alice_pub_schnorr:
     input:
@@ -1731,6 +1706,8 @@ callbacks:
       - id: schnorr-pub
         attr: data
     output:
+      - id: generator-point-schnorr
+        attr: children
       - id: alice-pub-schnorr
         attr: children
       - id: secret-schnorr-render
@@ -1791,8 +1768,6 @@ callbacks:
       attr: value
     - id: schnorr-s
       attr: value
-    - id: signatures-schnorr-validate
-      attr: children
     callback: elliptic.dashboard.hash_concat
 
 
@@ -1809,3 +1784,25 @@ callbacks:
 
     callback: elliptic.dashboard.render_signature_schnorr
   
+
+  validate_schnorr_signature: #(p_i, a, b, h, s, points):
+    input:
+    - id: user-input-p
+      attr: value
+    - id: user-input-a
+      attr: value
+    - id: user-input-b
+      attr: value
+    - id: hash-concat
+      attr: value
+    - id: schnorr-s
+      attr: value
+    - id: schnorr-pub
+      attr: data
+    output:
+    - id: signatures-schnorr-validate
+      attr: children
+    callback: elliptic.dashboard.validate_schnorr_signature
+
+
+

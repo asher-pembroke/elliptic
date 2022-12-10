@@ -292,7 +292,6 @@ def schnorr_graph_sign(p_i, a, b, n, points, k):
                 title=dict(font=dict(color='white')))
             )
 
-    title_str = ''
 
     order_ = order(p, a, b)
 
@@ -356,7 +355,7 @@ def schnorr_graph_sign(p_i, a, b, n, points, k):
                 xaxis=dict(range=[0,p-1]),
                 yaxis=dict(range=[0,p-1]),
                 title=dict(font=dict(color='white'),
-                    text="$ {} $".format(title_str))))
+                    text="select generator point")))
 
 
     return fig
@@ -965,14 +964,15 @@ def render_pub_key(p_i, a, b, points):
 
 def render_schnorr_keys(p_i, a, b, points):
     p = primes_[p_i]
-    points_str = '', ''
+    points_str = '', '', ''
     if points is not None:
         curve_key = str((p,a,b))
         if curve_key in points:
             if len(points[curve_key]) == 3:
+                G_0 = points[curve_key][0]
                 pubkey = points[curve_key][1]
                 kkey = points[curve_key][2]
-                points_str = ['**({}, {})**'.format(*_) for _ in (pubkey, kkey)]
+                points_str = ['**({}, {})**'.format(*_) for _ in (G_0, pubkey, kkey)]
     return points_str
 
 
@@ -1352,7 +1352,11 @@ def validate_user_answer(answer):
 
 def cat(pub_key, secret_r, message):
     """concatonate all str arguments"""
-    print(pub_key, secret_r, message)
+    for _ in pub_key, secret_r, message:
+        if _ is None:
+            raise PreventUpdate
+
+    # print(pub_key, secret_r, message)
     for _ in [pub_key, secret_r, message]:
         if len(_) == 0:
             raise PreventUpdate
@@ -1383,25 +1387,7 @@ def hash_concat(p_i, a, b, pub_points, message, d_a, k):
 
     s = (k%subgroup_order_ + (h%subgroup_order_)*(d_a%subgroup_order_))%subgroup_order_
 
-    
-    sG = s*G
-
-    Rp = point_in_curve(R[0], R[1], p, a, b)
-
-    Hp = point_in_curve(H_A[0], H_A[1], p, a, b)
-    
-
-    # Check that sG = R + h*H_A
-    sG_v = Rp + h*Hp
-
-
-    validate = f"""
-$$ {s} \\cdot ({G.x.num}, {G.y.num}) = ({sG.x.num}, {sG.y.num}) $$
-
-$$ ({Rp.x.num}, {Rp.y.num}) + {h} \\cdot ({Hp.x.num}, {Hp.y.num}) = ({sG_v.x.num, sG_v.y.num})$$
-"""
-
-    return h, s, validate
+    return h, s
 
 
 def render_signature_schnorr(s,R):
@@ -1411,4 +1397,32 @@ def render_signature_schnorr(s,R):
     renderable_sig = f'    ({s}, {R})'
 
     return renderable_sig
+
+def validate_schnorr_signature(p_i, a, b, h, s, points):
+    p = primes_[p_i]
+
+    curve_key = str((p,a,b))
+
+    if curve_key not in points:
+        raise PreventUpdate
+
+    pts = points[curve_key]
+
+    if len(pts) != 3:
+        raise PreventUpdate
+
+    G_0, H_A, R = [point_in_curve(pt[0], pt[1], p, a, b) for pt in pts]
+
+
+    # Check that sG = R + h*H_A
+    sG_v = R + h*H_A
+    sG = s*G_0
+
+    validate = f"""
+        ${s} \\cdot ({G_0.x.num}, {G_0.y.num}) = ({sG.x.num}, {sG.y.num})$
+
+        $({R.x.num}, {R.y.num}) + {h} \\cdot ({H_A.x.num}, {H_A.y.num}) = ({sG_v.x.num}, {sG_v.y.num})$
+        """
+    return validate
+
 
