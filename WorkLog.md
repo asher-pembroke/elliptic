@@ -1,3 +1,5 @@
+# 2022-12-10 16:02:38.699914: clock-out
+
 * turning off debug mode
 * cleaning up, debug schnorr interface
 
