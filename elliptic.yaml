@@ -205,7 +205,7 @@ verify_message_schnorr: "## Validating
 
 To verify a signature:
 
-* check that $s \\cdot G_0 = R + h \\cdot P$
+* check that $s \\cdot G_0 = R + h \\cdot H_A$
 
 * done!
 
@@ -1638,7 +1638,7 @@ callbacks:
     callback: elliptic.dashboard.update_crypto_buttons
 
 ### schnorr
-  schnorr_graph_alice:
+  schnorr_graph_sign:
     input:
       - id: user-input-p
         attr: value
@@ -1650,31 +1650,33 @@ callbacks:
         attr: value
       - id: schnorr-pub
         attr: data
-      # - id: sharing-mode
-      #   attr: value
+      - id: secret-schnorr
+        attr: value
+      # - id: secret-schnorr-store
+      #   attr: data
     output:
       - id: private-key-schnorr
         attr: figure
-    callback: elliptic.dashboard.multiply_graph
+    callback: elliptic.dashboard.schnorr_graph_sign
 
-  schnorr_graph_secret:
-    input:
-      - id: user-input-p
-        attr: value
-      - id: user-input-a
-        attr: value
-      - id: user-input-b
-        attr: value
-      - id: secret-schnorr
-        attr: value
-      - id: secret-schnorr-store
-        attr: data
-      # - id: sharing-mode
-      #   attr: value
-    output:
-      - id: secret-key-schnorr
-        attr: figure
-    callback: elliptic.dashboard.multiply_graph
+  # schnorr_graph_secret:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: secret-schnorr
+  #       attr: value
+  #     - id: secret-schnorr-store
+  #       attr: data
+  #     # - id: sharing-mode
+  #     #   attr: value
+  #   output:
+  #     - id: secret-key-schnorr
+  #       attr: figure
+  #   callback: elliptic.dashboard.multiply_graph
 
   update_alice_pub_schnorr:
     input:
@@ -1686,6 +1688,8 @@ callbacks:
         attr: value
       - id: alice-priv-schnorr
         attr: value
+      - id: secret-schnorr
+        attr: value
       - id: private-key-schnorr
         attr: clickData
     state:
@@ -1694,27 +1698,27 @@ callbacks:
     output:
       - id: schnorr-pub
         attr: data
-    callback: elliptic.dashboard.update_multiply_points
+    callback: elliptic.dashboard.update_schnorr_points
 
-  update_alice_secret_schnorr:
-    input:
-      - id: user-input-p
-        attr: value
-      - id: user-input-a
-        attr: value
-      - id: user-input-b
-        attr: value
-      - id: secret-schnorr
-        attr: value
-      - id: secret-key-schnorr
-        attr: clickData
-    state:
-      - id: secret-schnorr-store
-        attr: data
-    output:
-      - id: secret-schnorr-store
-        attr: data
-    callback: elliptic.dashboard.update_multiply_points
+  # update_alice_secret_schnorr:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: secret-schnorr
+  #       attr: value
+  #     - id: secret-key-schnorr
+  #       attr: clickData
+  #   state:
+  #     - id: secret-schnorr-store
+  #       attr: data
+  #   output:
+  #     - id: secret-schnorr-store
+  #       attr: data
+  #   callback: elliptic.dashboard.update_multiply_points
 
   render_alice_pub_schnorr:
     input:
@@ -1729,23 +1733,25 @@ callbacks:
     output:
       - id: alice-pub-schnorr
         attr: children
-    callback: elliptic.dashboard.render_pub_key
-
-
-  render_alice_secret_schnorr:
-    input:
-      - id: user-input-p
-        attr: value
-      - id: user-input-a
-        attr: value
-      - id: user-input-b
-        attr: value
-      - id: secret-schnorr-store
-        attr: data
-    output:
       - id: secret-schnorr-render
         attr: children
-    callback: elliptic.dashboard.render_pub_key
+    callback: elliptic.dashboard.render_schnorr_keys
+
+
+  # render_alice_secret_schnorr:
+  #   input:
+  #     - id: user-input-p
+  #       attr: value
+  #     - id: user-input-a
+  #       attr: value
+  #     - id: user-input-b
+  #       attr: value
+  #     - id: secret-schnorr-store
+  #       attr: data
+  #   output:
+  #     - id: secret-schnorr-render
+  #       attr: children
+  #   callback: elliptic.dashboard.render_pub_key
 
   concatonate:
     input:
@@ -1772,8 +1778,8 @@ callbacks:
       attr: value
     - id: schnorr-pub
       attr: data
-    - id: secret-schnorr-store
-      attr: data
+    # - id: secret-schnorr-store
+    #   attr: data
     - id: concat
       attr: children
     - id: alice-priv-schnorr

@@ -262,6 +262,105 @@ def multiply_graph(p_i, a, b, n, points, *args):
 
     return fig
 
+
+def schnorr_graph_sign(p_i, a, b, n, points, k):
+    """multiply points by n"""
+    if n is None:
+        raise PreventUpdate
+
+    if k is None:
+        raise PreventUpdate
+
+    ctx = dash.callback_context
+
+    p = primes_[p_i]
+
+    curve = elliptic(p, a, b)
+
+    fig = go.Figure(
+            data=go.Heatmap(z=curve,
+                showscale=False,
+                colorscale='gray',
+                hoverinfo = 'text',
+                text = array_to_str(curve),
+                ),
+            layout=dict(paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                width=600, height=600,
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                title=dict(font=dict(color='white')))
+            )
+
+    title_str = ''
+
+    order_ = order(p, a, b)
+
+    if points is None:
+        raise PreventUpdate
+
+    curve_key = str((p,a,b))
+
+
+    if curve_key not in points:
+        raise PreventUpdate
+
+    pts = points[curve_key]
+
+    if len(pts) > 0:
+        x_0, y_0 = pts[0]
+        base_point = go.Scatter(x=[x_0], y=[y_0],
+            text=[],
+            marker_symbol='square',
+            marker=dict(size=get_p_size(p_i)),
+            hoverinfo='skip',
+            mode='markers',
+            showlegend=False,)
+        fig.add_trace(base_point)
+
+    if len(pts) == 3: # get second point
+        x_n, y_n = pts[1]
+        n_point = go.Scatter(x=[x_n], y=[y_n],
+            text=[],
+            marker_symbol='square',
+            marker=dict(size=get_p_size(p_i)),
+            hoverinfo='skip',
+            mode='markers',
+            showlegend=False)
+        fig.add_trace(n_point)
+
+        x_k, y_k = pts[2]
+        k_point = go.Scatter(x=[x_k], y=[y_k],
+            text=[],
+            marker_symbol='square',
+            marker=dict(size=get_p_size(p_i)),
+            hoverinfo='skip',
+            mode='markers',
+            showlegend=False)
+        fig.add_trace(k_point)
+
+        
+
+    if len(pts) > 0:
+        subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
+
+        # if active_tab == 'point-multiplication':
+        #     title_str += "\quad N_{" + point_str(x_0, y_0) + "}" + f":{subgroup_order_}"
+
+    for p_, p_title in zip(pts, ['G_0', 'H_A', 'R']):
+        x_, y_ = p_
+        str_annotation = f'${p_title}=({x_},{y_})$'
+        fig.add_annotation(**get_pnt_annotation(x_, y_, str_annotation))
+
+    fig.update_layout(dict(
+                xaxis=dict(range=[0,p-1]),
+                yaxis=dict(range=[0,p-1]),
+                title=dict(font=dict(color='white'),
+                    text="$ {} $".format(title_str))))
+
+
+    return fig
+
 def extended_gcd(aa, bb):
     # from https://rosettacode.org/wiki/Modular_inverse#Python
     lastremainder, remainder = abs(aa), abs(bb)
@@ -774,6 +873,51 @@ def update_multiply_points(p_i, a, b, n, clickData, store):
     store[curve_key] = points
     return store
 
+def update_schnorr_points(p_i, a, b, n, k, clickData, store):
+    if n is None:
+        raise PreventUpdate
+
+    if k is None:
+        raise PreventUpdate
+
+    p = primes_[p_i]
+
+    curve_key = str((p, a, b))
+
+    if store is not None:
+        if curve_key in store:
+            points = [tuple(v) for v in store[curve_key]]
+        else:
+            points = []
+    else:
+        points = []
+        store = {curve_key: points}
+
+    if clickData is not None:
+        # replace the first point
+        p_0 = clickData['points'][0]
+        x_0, y_0 = p_0['x'], p_0['y']
+        try:
+            G_0 = point_in_curve(x_0, y_0, p, a, b)
+            points = [(x_0, y_0)]
+        except ValueError:
+            raise PreventUpdate
+
+        p_n = n*G_0
+        if p_n.x is not None:
+            points.append((p_n.x.num, p_n.y.num))
+        else:
+            points.append((-1, -1))
+
+        p_k = k*G_0
+        if p_k.x is not None:
+            points.append((p_k.x.num, p_k.y.num))
+        else:
+            points.append((-1, -1))
+        
+    store[curve_key] = points
+    return store
+
 def update_add_points(p_i, a, b, clickData, store):
     p = primes_[p_i]
 
@@ -816,6 +960,19 @@ def render_pub_key(p_i, a, b, points):
             if len(points[curve_key]) == 2:
                 pubkey = points[curve_key][-1]
                 points_str = '**({}, {})**'.format(*pubkey)
+    return points_str
+
+
+def render_schnorr_keys(p_i, a, b, points):
+    p = primes_[p_i]
+    points_str = '', ''
+    if points is not None:
+        curve_key = str((p,a,b))
+        if curve_key in points:
+            if len(points[curve_key]) == 3:
+                pubkey = points[curve_key][1]
+                kkey = points[curve_key][2]
+                points_str = ['**({}, {})**'.format(*_) for _ in (pubkey, kkey)]
     return points_str
 
 
@@ -1202,7 +1359,7 @@ def cat(pub_key, secret_r, message):
     return ''.join([pub_key.strip('**'), secret_r.strip('**'), message])
 
 
-def hash_concat(p_i, a, b, pub_points, secret_points, message, d_a, k):
+def hash_concat(p_i, a, b, pub_points, message, d_a, k):
     p = primes_[p_i]
 
     curve_key = str((p,a,b))
@@ -1216,36 +1373,35 @@ def hash_concat(p_i, a, b, pub_points, secret_points, message, d_a, k):
         raise PreventUpdate
 
     G_0 = tuple(pub_points[0])
-
-
-    if curve_key not in secret_points:
-        raise PreventUpdate
+    H_A = tuple(pub_points[1])
+    R = tuple(pub_points[2])
     
-    secret_points = secret_points[curve_key]
-    
-    if len(secret_points) == 0:
-        raise PreventUpdate
-    R = tuple(secret_points[0])
-    
-
-
-    x_0, y_0 = pub_points[0]
-    subgroup_order_ = subgroup_order(point_in_curve(x_0, y_0, p, a, b))
+    G = point_in_curve(G_0[0], G_0[1], p, a, b)
+    subgroup_order_ = subgroup_order(G)
 
     h = get_z(message)%subgroup_order_
 
     s = (k%subgroup_order_ + (h%subgroup_order_)*(d_a%subgroup_order_))%subgroup_order_
 
-    G = point_in_curve(G_0[0], G_0[1], p, a, b)
+    
     sG = s*G
 
     Rp = point_in_curve(R[0], R[1], p, a, b)
-    H_A = d_A*H_A
-    # V = Rp + *H_A
-    # validate = f'${s} \\cdot {G_0} = {sG.x.num, sG.y.num} = {R} + {h} \\cdot {H_A} = ({V.x.num}, {V.y.num})$'
-    # validate = f'${s} \\cdot {G_0} = {sG.x.num, sG.y.num}$' + f"= {V.x.num}, {V.y.num}"
 
-    return h, s, 'valid?'
+    Hp = point_in_curve(H_A[0], H_A[1], p, a, b)
+    
+
+    # Check that sG = R + h*H_A
+    sG_v = Rp + h*Hp
+
+
+    validate = f"""
+$$ {s} \\cdot ({G.x.num}, {G.y.num}) = ({sG.x.num}, {sG.y.num}) $$
+
+$$ ({Rp.x.num}, {Rp.y.num}) + {h} \\cdot ({Hp.x.num}, {Hp.y.num}) = ({sG_v.x.num, sG_v.y.num})$$
+"""
+
+    return h, s, validate
 
 
 def render_signature_schnorr(s,R):

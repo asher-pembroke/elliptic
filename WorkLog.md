@@ -1,3 +1,4 @@
+* validation working somewhat
 
 # 2022-12-10 10:48:53.495664: clock-in
 
