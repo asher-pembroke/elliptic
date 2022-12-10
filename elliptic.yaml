@@ -31,7 +31,7 @@ run_server:
     - elliptic.yaml
     - problems.yaml
     - ellitic/dashboard.py
-  debug: True
+  debug: False
 
 input_p:
   dbc.Col:

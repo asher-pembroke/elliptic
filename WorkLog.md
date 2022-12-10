@@ -1,3 +1,4 @@
+* turning off debug mode
 * cleaning up, debug schnorr interface
 
 # 2022-12-10 14:20:46.670334: clock-in
